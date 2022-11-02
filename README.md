@@ -1,5 +1,6 @@
 # VRCDiscordBotNotifier
-
+# THIS WILL HAEV UPDATES PLEASE DOWNLOAD THE NEWEST VERSION.
+### Right now there are some bugs.
 ## A discord bot that sends you notifications.
 
 ### 1 -> Online / Offline Friends;
