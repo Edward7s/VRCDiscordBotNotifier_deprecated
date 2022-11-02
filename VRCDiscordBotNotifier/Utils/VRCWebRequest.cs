@@ -13,7 +13,6 @@ namespace VRCDiscordBotNotifier.Utils
     {
         public static VRCWebRequest Instance { get; set; }
         private CookieContainer s_cookies = new CookieContainer();
-        public HttpWebRequest VRCRequest { get; private set; }
         public HttpWebResponse WebResponse { get; private set; }
         private string s_payload { get; set; } = string.Empty;
         private static HttpWebRequest? _testReq { get; set; }
@@ -49,7 +48,7 @@ namespace VRCDiscordBotNotifier.Utils
             s_payload = string.Empty;
             if (payload != null)
                 s_payload = JsonConvert.SerializeObject(payload);
-            VRCRequest = (HttpWebRequest)WebRequest.Create(url);
+           var VRCRequest = (HttpWebRequest)WebRequest.Create(url);
             VRCRequest.CookieContainer = s_cookies;
             VRCRequest.Method = req == 0 ? "Put" : "Get";
             VRCRequest.UserAgent = "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Mobile Safari/537.36";
@@ -65,6 +64,7 @@ namespace VRCDiscordBotNotifier.Utils
                     writer.Write(s_payload);
             }
             WebResponse = (HttpWebResponse)VRCRequest.GetResponse();
+            VRCRequest = null;
             using (var reader = new StreamReader(WebResponse.GetResponseStream(), ASCIIEncoding.UTF8))
                 return reader.ReadToEnd();
 

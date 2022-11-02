@@ -44,6 +44,14 @@ namespace VRCDiscordBotNotifier.Utils
             public string id { get; set; }
             public string type { get; set; }
             public string favoriteId { get; set; }
+        }
+        public class Notification
+        {
+            public string id { get; set; }
+            public string senderUsername { get; set; }
+            public string type { get; set; }
+            public string details { get; set; }
+            public string created_at { get; set; }
 
         }
     }

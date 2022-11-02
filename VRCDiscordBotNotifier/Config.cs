@@ -11,6 +11,7 @@ using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel;
+using Microsoft.Win32;
 
 namespace VRCDiscordBotNotifier
 {
@@ -20,8 +21,9 @@ namespace VRCDiscordBotNotifier
         public Json.Config JsonConfig { get; set; }
         private string _fileName { get; } = "\\VRCDiscordBotManager.json";
         public string FriendsFile { get; } = "\\FriendsListBot.json";
-        public string FriendsInfo { get; } = "\\FriendsInfoBot.json";
-        public string OnlineFriends { get; } = "\\OnlineFriendsBot.json";
+        /*     public string FriendsInfo { get; } = "\\FriendsInfoBot.json";
+             public string OnlineFriends { get; } = "\\OnlineFriendsBot.json";*/
+        public string Notifications { get; } = "\\NotificationsBot.json";
 
         public void SaveConfig() =>
             File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + _fileName, JsonConvert.SerializeObject(JsonConfig));
@@ -68,38 +70,44 @@ namespace VRCDiscordBotNotifier
                 jobject = null;
                 FriendsList = null;
             }
+            if (!File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Notifications))
+                File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Notifications, VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get,VRCInfo.VRCApiLink + VRCInfo.EndPoints.Notifications));
+
+
+            RegistryKey startup = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+            if (startup.GetValue("VRCDiscordBotNotifier") == null)
+                startup.SetValue("VRCDiscordBotNotifier", Directory.GetCurrentDirectory() + "\\VRCDiscordBotNotifier.exe");
 
 
 
-    
-             /*   JObject UserInfoObj = null;
-                var jobject2 = JObject.FromObject(JObject.Parse(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.LocalUser)))["friends"];
-                for (int i = 0; i < jobject2.ToArray().Length; i++)
-                {
-                    UserInfoObj = JObject.FromObject(JObject.Parse(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.UserEndPoint + jobject2[i].ToString())));
-                    UsersArr.Add(new Json.User()
-                    {
-                        Id = jobject2[i].ToString(),
-                        Name = UserInfoObj["displayName"].ToString(),
-                        Status = UserInfoObj["statusDescription"].ToString(),
-                        State = UserInfoObj["status"].ToString(),                      
-                    }) ;
-                }
-                File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + FriendsInfo, JsonConvert.SerializeObject(UsersArr));
-                UserInfoObj = null;
-            jobject2 = null;*/
-            
+            /*   JObject UserInfoObj = null;
+               var jobject2 = JObject.FromObject(JObject.Parse(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.LocalUser)))["friends"];
+               for (int i = 0; i < jobject2.ToArray().Length; i++)
+               {
+                   UserInfoObj = JObject.FromObject(JObject.Parse(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.UserEndPoint + jobject2[i].ToString())));
+                   UsersArr.Add(new Json.User()
+                   {
+                       Id = jobject2[i].ToString(),
+                       Name = UserInfoObj["displayName"].ToString(),
+                       Status = UserInfoObj["statusDescription"].ToString(),
+                       State = UserInfoObj["status"].ToString(),                      
+                   }) ;
+               }
+               File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + FriendsInfo, JsonConvert.SerializeObject(UsersArr));
+               UserInfoObj = null;
+           jobject2 = null;*/
 
-          /*  if (!File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + OnlineFriends))
-            {
-                string FriendsList = string.Empty;
-                var jobject = JObject.FromObject(JObject.Parse(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.LocalUser)));
-                for (int i = 0; i < jobject["onlineFriends"].ToArray().Length; i++)
-                    FriendsList += jobject["onlineFriends"][i].ToString() + "\n";
-                File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + OnlineFriends, FriendsList);
-                jobject = null;
-                FriendsList = null;
-            }*/
+
+            /*  if (!File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + OnlineFriends))
+              {
+                  string FriendsList = string.Empty;
+                  var jobject = JObject.FromObject(JObject.Parse(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.LocalUser)));
+                  for (int i = 0; i < jobject["onlineFriends"].ToArray().Length; i++)
+                      FriendsList += jobject["onlineFriends"][i].ToString() + "\n";
+                  File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + OnlineFriends, FriendsList);
+                  jobject = null;
+                  FriendsList = null;
+              }*/
 
         }
         private void Register()

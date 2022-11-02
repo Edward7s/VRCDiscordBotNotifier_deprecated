@@ -54,6 +54,7 @@ namespace VRCDiscordBotNotifier
             await DiscordClientManager.ConnectAsync();
             DiscordGuild = await Program.DiscordClientManager.GetGuildAsync(ulong.Parse(Config.Instance.JsonConfig.DiscordServerId));
             new Initialization();
+            Task.Run(() => NotificationsLoop.Loop());
             Task.Run(() => new WebSocket.VRCWebSocket());
             await Task.Delay(-1);
         }

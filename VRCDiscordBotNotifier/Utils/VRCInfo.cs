@@ -20,7 +20,10 @@ namespace VRCDiscordBotNotifier.Utils
             public static string Avatar { get; } = "avatars/"; /* AvatarId */
             public static string Friends { get; } = "auth/user/friends";
             public static string FavoritesFriends { get; } = "favorites?type=friend&n=300";
+            public static string Notifications { get; } = "auth/user/notifications?n=100";
 
+
+            //notifications?n=100
 
         }
     }
