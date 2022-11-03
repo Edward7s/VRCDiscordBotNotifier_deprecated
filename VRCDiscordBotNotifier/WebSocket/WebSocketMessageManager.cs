@@ -67,11 +67,15 @@ namespace VRCDiscordBotNotifier.WebSocket
                 Color = new DiscordColor(Extentions.GetColorFromUserStatus(s_user["status"].ToString())),
                 Description = "UserId: " + s_user["id"].ToString() + "\nState: " + s_user["status"].ToString() + " \nStatus: " + s_user["statusDescription"].ToString() + "\nLocation: " + jobj["location"].ToString() + "\nTraveling to: " + jobj["travelingToLocation"].ToString() + "\n" + s_worldInfo,
             });
-            if (s_joinable)
-              await  s_message.CreateReactionAsync(DiscordEmoji.FromUnicode("⬆️"));
-            s_message = null;
             s_user = null;
             s_worldInfo = string.Empty;
+            Thread.Sleep(700);
+            if (s_joinable)
+            {
+                await s_message.CreateReactionAsync(DiscordEmoji.FromUnicode("⬆️"));
+                s_message = null;
+            }
+         
         }
 
         /*  public static async Task Location(JObject User)

@@ -77,15 +77,12 @@ namespace VRCDiscordBotNotifier
            string[] lines = message.Embeds[0].Description.Split("\n");
             if (lines.ElementAtOrDefault(4).Trim().Length > 40)
             {
-                Console.WriteLine(lines.ElementAtOrDefault(4).Replace("Traveling to: ", "").Trim());
                 VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Post, VRCInfo.VRCApiLink + VRCInfo.EndPoints.SelfInvite + lines.ElementAtOrDefault(4).Replace("Traveling to: ", "").Trim());
                 lines = null;
                 return;
             }
-
             if (lines.ElementAtOrDefault(3).Trim().Length > 40)
             {
-                Console.WriteLine(lines.ElementAtOrDefault(3).Replace("Location: ", "").Trim());
                 VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Post, VRCInfo.VRCApiLink + VRCInfo.EndPoints.SelfInvite + lines.ElementAtOrDefault(3).Replace("Location: ", "").Trim());
                 lines = null;
                 return;
