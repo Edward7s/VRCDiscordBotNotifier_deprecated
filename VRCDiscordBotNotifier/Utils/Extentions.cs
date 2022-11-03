@@ -22,10 +22,10 @@ namespace VRCDiscordBotNotifier.Utils
         public static string GetColorFromUserStatus(string State)
         {
             if (State == "active")
-                return "#94bfff";
+                return "#4dff5e";
 
             if (State == "join me")
-                return "#4dff5e";
+                return  "#94bfff";
 
             if (State == "join me")
                 return "#4dff5e";

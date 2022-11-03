@@ -35,7 +35,8 @@ namespace VRCDiscordBotNotifier.Utils
         public enum RequestType
         {
             Put,
-            Get
+            Get,
+            Post
         }
         public VRCWebRequest()
         {
@@ -50,7 +51,7 @@ namespace VRCDiscordBotNotifier.Utils
                 s_payload = JsonConvert.SerializeObject(payload);
            var VRCRequest = (HttpWebRequest)WebRequest.Create(url);
             VRCRequest.CookieContainer = s_cookies;
-            VRCRequest.Method = req == 0 ? "Put" : "Get";
+            VRCRequest.Method = req.ToString();
             VRCRequest.UserAgent = "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Mobile Safari/537.36";
             VRCRequest.ContentType = "application/json";
             VRCRequest.Accept = "application/json, text/plain, */*";
