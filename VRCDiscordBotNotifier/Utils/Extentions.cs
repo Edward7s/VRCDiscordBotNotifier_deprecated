@@ -12,9 +12,9 @@ namespace VRCDiscordBotNotifier.Utils
     {
         public static async Task<DiscordChannel> GetOrCreateChannel(string Channel)
         {
-            var channels = await Program.DiscordGuild.GetChannelsAsync();
+            var channels = await BotSetup.Instance.DiscordGuild.GetChannelsAsync();
             if (channels.FirstOrDefault(x => x.Name == Channel) == null)
-                return await Program.DiscordGuild.CreateChannelAsync(Channel, DSharpPlus.ChannelType.Text);
+                return await BotSetup.Instance.DiscordGuild.CreateChannelAsync(Channel, DSharpPlus.ChannelType.Text);
             else
                 return channels.First(x => x.Name == Channel);
         }

@@ -63,7 +63,7 @@ namespace VRCDiscordBotNotifier
             if (!File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + FriendsFile))
             {
                 string FriendsList = string.Empty;
-                var jobject = JObject.FromObject(JObject.Parse(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.LocalUser)));
+                var jobject = JObject.Parse(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.LocalUser));
                 for (int i = 0; i < jobject["friends"].ToArray().Length; i++)
                     FriendsList += jobject["friends"][i].ToString() + "\n";
                 File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + FriendsFile, FriendsList);
@@ -78,36 +78,6 @@ namespace VRCDiscordBotNotifier
             if (startup.GetValue("VRCDiscordBotNotifier") == null)
                 startup.SetValue("VRCDiscordBotNotifier", Directory.GetCurrentDirectory() + "\\VRCDiscordBotNotifier.exe");
 
-
-
-            /*   JObject UserInfoObj = null;
-               var jobject2 = JObject.FromObject(JObject.Parse(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.LocalUser)))["friends"];
-               for (int i = 0; i < jobject2.ToArray().Length; i++)
-               {
-                   UserInfoObj = JObject.FromObject(JObject.Parse(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.UserEndPoint + jobject2[i].ToString())));
-                   UsersArr.Add(new Json.User()
-                   {
-                       Id = jobject2[i].ToString(),
-                       Name = UserInfoObj["displayName"].ToString(),
-                       Status = UserInfoObj["statusDescription"].ToString(),
-                       State = UserInfoObj["status"].ToString(),                      
-                   }) ;
-               }
-               File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + FriendsInfo, JsonConvert.SerializeObject(UsersArr));
-               UserInfoObj = null;
-           jobject2 = null;*/
-
-
-            /*  if (!File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + OnlineFriends))
-              {
-                  string FriendsList = string.Empty;
-                  var jobject = JObject.FromObject(JObject.Parse(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.LocalUser)));
-                  for (int i = 0; i < jobject["onlineFriends"].ToArray().Length; i++)
-                      FriendsList += jobject["onlineFriends"][i].ToString() + "\n";
-                  File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + OnlineFriends, FriendsList);
-                  jobject = null;
-                  FriendsList = null;
-              }*/
 
         }
         private void Register()
@@ -142,7 +112,7 @@ namespace VRCDiscordBotNotifier
                 CheckVRCUser();
                 return;
             }
-            JsonConfig.UserId = JObject.FromObject(JObject.Parse(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.LocalUser)))["id"].ToString();
+            JsonConfig.UserId = JObject.Parse(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.LocalUser))["id"].ToString();
             File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + _fileName, JsonConvert.SerializeObject(JsonConfig));
         }
     }

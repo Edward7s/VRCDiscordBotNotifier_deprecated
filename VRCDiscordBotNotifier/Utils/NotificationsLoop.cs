@@ -13,14 +13,14 @@ namespace VRCDiscordBotNotifier.Utils
 {
     internal class NotificationsLoop
     {
-        private static Json.Notification[]? s_notificationsArr { get; set; }
-        private static string s_apiNotifications { get; set; } = string.Empty;
-        private static Json.Notification[]? s_apiNotificationsArr { get; set; }
-        private static DiscordMember? s_member { get; set; }
-        private static DiscordDmChannel? s_dm { get; set; }
+        private  Json.Notification[]? s_notificationsArr { get; set; }
+        private  string s_apiNotifications { get; set; } = string.Empty;
+        private  Json.Notification[]? s_apiNotificationsArr { get; set; }
+        private  DiscordMember? s_member { get; set; }
+        private  DiscordDmChannel? s_dm { get; set; }
 
         //The reason why I am doing this and not using the websocket its be cause the websocket does not send notifications from the past.
-        public static async void Loop()
+        public async void Loop()
         {
             if (Config.Instance.JsonConfig.DmNewNotifications)
             {
@@ -34,9 +34,9 @@ namespace VRCDiscordBotNotifier.Utils
                     for (int j = 0; j < Config.Instance.JsonConfig.DmUsersId.Length; j++)
                     {
                         Thread.Sleep(200);
-                        s_member = await Program.DiscordGuild.GetMemberAsync(ulong.Parse(Config.Instance.JsonConfig.DmUsersId[j]));
+                        s_member = await BotSetup.Instance.DiscordGuild.GetMemberAsync(ulong.Parse(Config.Instance.JsonConfig.DmUsersId[j]));
                         s_dm = await s_member.CreateDmChannelAsync();
-                        await s_dm.SendMessageAsync(new DiscordEmbedBuilder() { Title = $"{{ {s_apiNotificationsArr[i].senderUsername} }} Sent you a {s_apiNotificationsArr[i].type}", Description = "Created at: " + s_apiNotificationsArr[i].created_at , Color = DiscordColor.Purple });
+                        await s_dm.SendMessageAsync(new DiscordEmbedBuilder() { Title = new StringBuilder().AppendFormat("{{ {0} }} Sent you a {1}", s_apiNotificationsArr[i].senderUsername, s_apiNotificationsArr[i].type).ToString(),Description = new StringBuilder().AppendFormat("Created at: {0}", s_apiNotificationsArr[i].created_at).ToString(), Color = DiscordColor.Purple });
                     }
                 }
                 File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Config.Instance.Notifications, s_apiNotifications);

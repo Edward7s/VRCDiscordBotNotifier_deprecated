@@ -13,33 +13,33 @@ namespace VRCDiscordBotNotifier.WebSocket
 {
     internal class WebSocketMessageManager
     {
-        private static JObject s_user { get; set; }
-        private static JObject s_world { get; set; }
+        private  JObject s_user { get; set; }
+        private  JObject s_world { get; set; }
 
-        private static string s_lastInstance { get; set; }
-        private static string s_lastId { get; set; }
+        private  string s_lastInstance { get; set; }
+        private  string s_lastId { get; set; }
 
-        private static string s_worldInfo { get; set; }
-        private static DiscordMessage s_message { get; set; }
+        private  string s_worldInfo { get; set; }
+        private  DiscordMessage s_message { get; set; }
 
-        private static bool s_joinable { get; set; }
-        public static async Task Offline(string id) =>
+        private  bool s_joinable { get; set; }
+        public  async Task Offline(string id) =>
             await Initialization.Instance.ChannelActivty.SendMessageAsync(new DiscordEmbedBuilder() { Title = "{ " + JObject.FromObject(JObject.Parse(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.UserEndPoint + id)))["displayName"].ToString() + " } Is now offline.",Description = "UserId: " + id, Color = DiscordColor.Gray });
 
 
-        public static async Task Online(JObject User)
+        public async Task Online(JObject User)
         {
             await Initialization.Instance.ChannelActivty.SendMessageAsync(new DiscordEmbedBuilder()
             {
-                Title = "{ " + User["displayName"].ToString() + " } Is now Online.",
+                Title = new StringBuilder().AppendFormat("{{ {0} }} Is now online", User["displayName"]).ToString(),
                 Color = new DiscordColor(Extentions.GetColorFromUserStatus(User["status"].ToString())),
-                Description = "UserId: " + User["id"].ToString() + "\nState: " + User["status"].ToString() + " \nStatus: " + User["statusDescription"].ToString(),
+                Description = new StringBuilder(string.Empty).AppendFormat("UserId: {0}\nState: {1}\nStatus: {2}",User["id"], User["status"], User["statusDescription"]).ToString(),
             });
         }
 
-        public static async Task Location(JObject jobj)
+        public async Task Location(JObject jobj)
         {
-            s_user = JObject.FromObject(JObject.Parse(jobj["user"].ToString()));
+            s_user = JObject.Parse(jobj["user"].ToString());
             if (s_lastId == s_user["id"].ToString() && s_lastInstance == jobj["location"].ToString())
             {
                 s_user = null;
@@ -55,17 +55,17 @@ namespace VRCDiscordBotNotifier.WebSocket
             }
             if (jobj["world"].ToString().Length > 30)
             {
-                s_world = JObject.FromObject(JObject.Parse(jobj["world"].ToString()));
-                s_worldInfo = $"Name: {s_world["name"].ToString()}\nId: {s_world["id"].ToString()}\nAuthorId: {s_world["authorName"].ToString()}";
+                s_world = JObject.Parse(jobj["world"].ToString());
+                s_worldInfo = new StringBuilder().AppendFormat("Name: {0}\nId: {1}\nAuthor Name: {2}", s_world["name"], s_world["id"], s_world["authorName"]).ToString();
                 s_world = null;
                 s_joinable = true;
             }
 
             s_message = await Initialization.Instance.ChannelActivty.SendMessageAsync(new DiscordEmbedBuilder()
             {
-                Title = "{ " + s_user["displayName"].ToString() + " } Changed His Location.",
+                Title = new StringBuilder().AppendFormat("{{ {0} }} Changed His Location.", s_user["displayName"]).ToString(),
                 Color = new DiscordColor(Extentions.GetColorFromUserStatus(s_user["status"].ToString())),
-                Description = "UserId: " + s_user["id"].ToString() + "\nState: " + s_user["status"].ToString() + " \nStatus: " + s_user["statusDescription"].ToString() + "\nLocation: " + jobj["location"].ToString() + "\nTraveling to: " + jobj["travelingToLocation"].ToString() + "\n" + s_worldInfo,
+                Description = new StringBuilder().AppendFormat("UserId: {0}\nState: {1}\nStatus: {2}\nLocation: {3}\nTraveling to: {4}\n{5}", s_user["id"], s_user["status"], s_user["statusDescription"], jobj["location"], jobj["travelingToLocation"], s_worldInfo).ToString(),
             });
             s_user = null;
             s_worldInfo = string.Empty;
@@ -77,16 +77,5 @@ namespace VRCDiscordBotNotifier.WebSocket
             }
          
         }
-
-        /*  public static async Task Location(JObject User)
-          {
-              await Initialization.Instance.ChannelActivty.SendMessageAsync(new DiscordEmbedBuilder()
-              {
-                  Title = "{ " + User["displayName"].ToString() + " } Changed His Location.",
-                  Color = new DiscordColor("#4d2000"),
-                  Description = "State: " + User["status"].ToString() + " \nStatus: " + User["statusDescription"].ToString() + "\nLocation: " + User["location"].ToString(),
-              });
-          }
-        */
     }
 }

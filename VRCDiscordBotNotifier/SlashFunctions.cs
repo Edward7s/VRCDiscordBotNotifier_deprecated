@@ -67,6 +67,7 @@ namespace VRCDiscordBotNotifier
         [SlashCommand("FriendsActivity", "Messages you if anything happens to one of your friends.")]
         public async Task MessageOn(InteractionContext context)
         {
+           
             Config.Instance.JsonConfig.FriendsActivity = !Config.Instance.JsonConfig.FriendsActivity;
             if (Config.Instance.JsonConfig.FriendsActivity)
                 Initialization.Instance.ChannelActivty = await Extentions.GetOrCreateChannel("n_activity");

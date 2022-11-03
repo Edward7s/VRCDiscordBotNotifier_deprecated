@@ -37,9 +37,9 @@ namespace VRCDiscordBotNotifier.WebSocket
                 ws.Log.Output = (s, e) => { };
                 ws.OnMessage += Ws_OnMessage;
             }
-
+          
         }
-
+        private WebSocketMessageManager _webSocketManager { get; } = new WebSocketMessageManager();
         private Json.WebSocket _wsJson { get; set; }
         public void Ws_OnMessage(object? sender, MessageEventArgs e)
         {
@@ -47,13 +47,13 @@ namespace VRCDiscordBotNotifier.WebSocket
             switch (_wsJson.type)
             {
                 case "friend-offline":
-                    WebSocketMessageManager.Offline(JObject.FromObject(JObject.Parse(_wsJson.content))["userId"].ToString());
+                    _webSocketManager.Offline(JObject.Parse(_wsJson.content)["userId"].ToString());
                     break;
                 case "friend-online":
-                    WebSocketMessageManager.Online(JObject.FromObject(JObject.Parse(JObject.FromObject(JObject.Parse(_wsJson.content))["user"].ToString())));
+                    _webSocketManager.Online(JObject.Parse(JObject.Parse(_wsJson.content)["user"].ToString()));
                     break;
                 case "friend-location":
-                    WebSocketMessageManager.Location(JObject.FromObject(JObject.Parse(_wsJson.content)));
+                    _webSocketManager.Location(JObject.Parse(_wsJson.content));
                     break;
             }
 
