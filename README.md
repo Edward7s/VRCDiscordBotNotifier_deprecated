@@ -1,5 +1,5 @@
 # VRCDiscordBotNotifier
-# THIS WILL HAEV UPDATES PLEASE DOWNLOAD THE NEWEST VERSION.
+# There will be new updates, make sure you always check the new versions.
 ### Right now there are some bugs.
 ## A discord bot that sends you notifications.
 
