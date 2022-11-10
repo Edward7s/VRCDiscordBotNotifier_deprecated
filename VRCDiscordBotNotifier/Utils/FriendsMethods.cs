@@ -13,22 +13,29 @@ namespace VRCDiscordBotNotifier.Utils
     internal class FriendsMethods
     {
         public static List<string> FriendList { get; } = new List<string>();
-        private List<Json.FriendGroup> s_users { get; set; }
-        private JToken? s_friends { get; set; }
+        public static string CurrentInstanceId { get; set; } = string.Empty;
+        private List<Json.FriendGroup> _users { get; set; }
+        private JToken? _friends { get; set; }
+        private JObject _localUser { get; set; }    
 
         private string? s_friendList { get; set; }
 
         public async void AllFriends()
         {
-            s_users = JsonConvert.DeserializeObject<List<Json.FriendGroup>>(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.FavoritesFriends));
+            _users = JsonConvert.DeserializeObject<List<Json.FriendGroup>>(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.FavoritesFriends));
+            Thread.Sleep(1500);
             FriendList.Clear();
-            for (int i = 0; i < s_users.Count; i++)
+            for (int i = 0; i < _users.Count; i++)
             {
                 Thread.Sleep(10);
-                FriendList.Add(s_users[i].favoriteId);
+                FriendList.Add(_users[i].favoriteId);
             }
-            s_users = null;
-            s_friends = JObject.Parse(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.LocalUser))["friends"];
+            _users = null;
+            _localUser = JObject.Parse(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.LocalUser));
+            _friends = _localUser["friends"];
+            CurrentInstanceId = new StringBuilder().AppendFormat("{0}:{1}", _localUser["presence"]["world"], _localUser["presence"]["instance"]).ToString();
+            _localUser = null;
+            Thread.Sleep(1500);
             if (Config.Instance.JsonConfig.DmFriendEvent)
             {
                 string friendsText = File.ReadAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Config.Instance.FriendsFile);
@@ -38,8 +45,8 @@ namespace VRCDiscordBotNotifier.Utils
                 string[] ids = File.ReadAllLines(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Config.Instance.FriendsFile);
                 for (int i = 0; i < ids.Length; i++)
                 {
-                    Thread.Sleep(500);
-                    if (s_friends.FirstOrDefault(x => x.ToString() == ids[i]) != null) continue;
+                    Thread.Sleep(300);
+                    if (_friends.FirstOrDefault(x => x.ToString() == ids[i]) != null) continue;
                     UserName = JObject.Parse(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.UserEndPoint + ids[i]))["displayName"].ToString();
                     for (int j = 0; j < Config.Instance.JsonConfig.DmUsersId.Length; j++)
                     {
@@ -50,17 +57,19 @@ namespace VRCDiscordBotNotifier.Utils
                     }
                 }
 
-                for (int i = 0; i < s_friends.ToArray().Length; i++)
+                for (int i = 0; i < _friends.ToArray().Length; i++)
                 {
-                    Thread.Sleep(500);
-                    if (friendsText.Contains(s_friends[i].ToString())) continue;
-                    UserName = JObject.Parse(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.UserEndPoint + s_friends[i]))["displayName"].ToString();
+                    Thread.Sleep(300);
+                    if (friendsText.Contains(_friends[i].ToString())) continue;
+                    UserName = JObject.Parse(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.UserEndPoint + _friends[i]))["displayName"].ToString();
+                    Thread.Sleep(2000);
+
                     for (int j = 0; j < Config.Instance.JsonConfig.DmUsersId.Length; j++)
                     {
                         Thread.Sleep(200);
                         member = await BotSetup.Instance.DiscordGuild.GetMemberAsync(ulong.Parse(Config.Instance.JsonConfig.DmUsersId[j]));
                         dmChannel = await member.CreateDmChannelAsync();
-                        await dmChannel.SendMessageAsync(new DiscordEmbedBuilder() { Title = new StringBuilder().AppendFormat("{{ {0} }} Added You.", UserName).ToString(), Color = DiscordColor.Green, Description = new StringBuilder().AppendFormat("UserId: {0}", s_friends[i]).ToString() });
+                        await dmChannel.SendMessageAsync(new DiscordEmbedBuilder() { Title = new StringBuilder().AppendFormat("{{ {0} }} Added You.", UserName).ToString(), Color = DiscordColor.Green, Description = new StringBuilder().AppendFormat("UserId: {0}", _friends[i]).ToString() });
                     }
                 }
                 member = null;
@@ -69,12 +78,12 @@ namespace VRCDiscordBotNotifier.Utils
             }
 
             s_friendList = string.Empty;
-            for (int i = 0; i < s_friends.ToArray().Length; i++)
-                s_friendList += s_friends[i].ToString() + "\n";
+            for (int i = 0; i < _friends.ToArray().Length; i++)
+                s_friendList += _friends[i].ToString() + "\n";
             File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Config.Instance.FriendsFile, s_friendList);
             s_friendList = null;
-            s_friends = null;
-            Thread.Sleep(50000);
+            _friends = null;
+            Thread.Sleep(45000);
             GC.Collect();
             GC.WaitForPendingFinalizers();
             AllFriends();

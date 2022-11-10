@@ -72,9 +72,12 @@ namespace VRCDiscordBotNotifier.Utils
                 using (var reader = new StreamReader(WebResponse.GetResponseStream(), ASCIIEncoding.UTF8))
                     return reader.ReadToEnd();
             }
-            finally
+            catch
             {
                 WebResponse.Dispose();
+                Thread.Sleep(500);
+                Console.WriteLine("ERROR ON REQ: {0}", url);
+                return SendVRCWebReq(req, url, payload);
             }
           
         }

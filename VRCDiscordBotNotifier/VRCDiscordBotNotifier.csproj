@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -7,7 +7,6 @@
     <Nullable>enable</Nullable>
     <ApplicationIcon>Nocturnal Circle.ico</ApplicationIcon>
   </PropertyGroup>
-
   <ItemGroup>
     <Content Include="Nocturnal Circle.ico" />
   </ItemGroup>

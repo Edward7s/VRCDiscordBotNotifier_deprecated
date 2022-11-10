@@ -20,6 +20,7 @@ namespace VRCDiscordBotNotifier.Utils
             public bool DmNewNotifications { get; set; }
             public bool FriendsActivity { get; set; }
             public bool FirstTime { get; set; }
+            public bool DmOnFriendJoin { get; set; }
 
         }
 

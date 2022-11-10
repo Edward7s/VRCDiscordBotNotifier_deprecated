@@ -20,19 +20,56 @@ namespace VRCDiscordBotNotifier.WebSocket
             using (var ws = new WebSocketSharp.WebSocket("wss://vrchat.com/?authToken=" + Config.Instance.JsonConfig.AuthCookie))
             {
                 ws.SslConfiguration.EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12;
-                ws.Connect();
+                try
+                {
+                    ws.Connect();
+                }
+                catch {
+
+                    while (!ws.IsAlive)
+                    {
+                        Thread.Sleep(300);
+                        try
+                        {
+                            ws.Connect();
+                        }
+                        catch { }
+                        Console.WriteLine("!");
+
+                    }
+                }
                 ws.OnClose += (s, e) =>
                 {
                     try
                     {
                         Console.WriteLine("Re Connecting to VRC ws.");
-                        ws.Connect();
+                        try
+                        {
+                            ws.Connect();
+                        }
+                        catch
+                        {
+
+                            while (!ws.IsAlive)
+                            {
+                                Thread.Sleep(300);
+                                try
+                                {
+                                    ws.Connect();
+                                }
+                                catch { }
+                                Console.WriteLine("!");
+
+                            }
+                        }
                     }
                     catch (Exception ex)
                     {
                         Console.WriteLine(ex);
                     }
                 };
+                var user = JObject.Parse(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.LocalUser));             
+                FriendsMethods.CurrentInstanceId = new StringBuilder().AppendFormat("{0}:{1}", user["presence"]["world"], user["presence"]["instance"]).ToString();
                 ws.OnOpen += (s, e) => Console.WriteLine("Connected to the VRChat WebSocket.");
                 ws.Log.Output = (s, e) => { };
                 ws.OnMessage += Ws_OnMessage;

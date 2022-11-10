@@ -41,7 +41,7 @@ namespace VRCDiscordBotNotifier.Utils
                 }
                 File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Config.Instance.Notifications, s_apiNotifications);
             }
-            Thread.Sleep(5000);
+            Thread.Sleep(17500);
             Loop();
         }
     }

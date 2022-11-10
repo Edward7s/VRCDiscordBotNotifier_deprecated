@@ -22,6 +22,7 @@ namespace VRCDiscordBotNotifier
         public  DiscordGuild DiscordGuild { get; private set; }
         public async Task Setup()
         {
+
             try
             {
                 DiscordClientManager = new DiscordClient(new DiscordConfiguration()

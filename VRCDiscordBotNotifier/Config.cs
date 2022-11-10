@@ -79,6 +79,19 @@ namespace VRCDiscordBotNotifier
                 startup.SetValue("VRCDiscordBotNotifier", Directory.GetCurrentDirectory() + "\\VRCDiscordBotNotifier.exe");
 
 
+            //Checking Integrity
+            for (int i = 0; i < _props.Length; i++)
+            {
+                if (_props[i].GetValue(JsonConfig) != null) continue;
+               
+                if (_props[i].GetType() == typeof(bool))
+                {
+                    _props[i].SetValue(JsonConfig, false);
+                    continue;
+                }
+            }
+
+
         }
         private void Register()
         {

@@ -55,6 +55,17 @@ namespace VRCDiscordBotNotifier
             await context.CreateResponseAsync($"You turned Notifications: {Toggle(Config.Instance.JsonConfig.DmNewNotifications)}");
         }
 
+        [SlashCommand("DmFriendJoin", "Dms you if a friend joins you world")]
+        public async Task Friendjoin(InteractionContext context)
+        {
+            Config.Instance.JsonConfig.DmOnFriendJoin = !Config.Instance.JsonConfig.DmOnFriendJoin;
+            Config.Instance.SaveConfig();
+
+            await context.CreateResponseAsync($"You turned Friend Join Dm: {Toggle(Config.Instance.JsonConfig.DmOnFriendJoin)}");
+        }
+
+
+
         [SlashCommand("DmFriendAddOrRemove", "Dms you if someone added you or removed you")]
         public async Task FriendM(InteractionContext context)
         {
