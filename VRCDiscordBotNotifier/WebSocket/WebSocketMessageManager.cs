@@ -41,7 +41,6 @@ namespace VRCDiscordBotNotifier.WebSocket
 
         public async Task Location(JObject jobj)
         {
-            Console.WriteLine(jobj);
             _user = JObject.Parse(jobj["user"].ToString());
             if (_lastId == _user["id"].ToString() && _lastInstance == jobj["location"].ToString())
             {
@@ -50,24 +49,18 @@ namespace VRCDiscordBotNotifier.WebSocket
             }
             _lastId = _user["id"].ToString();
             _lastInstance = jobj["location"].ToString();
-            try
-            {
-                if (Config.Instance.JsonConfig.DmOnFriendJoin && FriendsMethods.CurrentInstanceId != "offline:offline")
-                {
-                    if (jobj["travelingToLocation"].ToString() == FriendsMethods.CurrentInstanceId || _lastInstance == FriendsMethods.CurrentInstanceId)
-                    {
-                        for (int j = 0; j < Config.Instance.JsonConfig.DmUsersId.Length; j++)
-                        {
-                            Thread.Sleep(300);
-                            _member = await BotSetup.Instance.DiscordGuild.GetMemberAsync(ulong.Parse(Config.Instance.JsonConfig.DmUsersId[j]));
-                            _dm = await _member.CreateDmChannelAsync();
-                            await _dm.SendMessageAsync(new DiscordEmbedBuilder() { Title = new StringBuilder().AppendFormat("{{ {0} }} Joined You.", _user["displayName"]).ToString(), Color = DiscordColor.Cyan });
-                        }
-                    }
 
+            if (Config.Instance.JsonConfig.DmOnFriendJoin && FriendsMethods.CurrentInstanceId != "offline:offline" && jobj["travelingToLocation"].ToString() == FriendsMethods.CurrentInstanceId)
+            {
+                for (int j = 0; j < Config.Instance.JsonConfig.DmUsersId.Length; j++)
+                {
+                    Thread.Sleep(300);
+                    _member = await BotSetup.Instance.DiscordGuild.GetMemberAsync(ulong.Parse(Config.Instance.JsonConfig.DmUsersId[j]));
+                    _dm = await _member.CreateDmChannelAsync();
+                    await _dm.SendMessageAsync(new DiscordEmbedBuilder() { Title = new StringBuilder().AppendFormat("{{ {0} }} Is Joining You.", _user["displayName"]).ToString(), Color = DiscordColor.Cyan });
                 }
             }
-            catch (Exception ex) { Console.WriteLine(ex); }
+
 
 
             if (_user["status"].ToString() == "ask me" || _user["status"].ToString() == "busy")
