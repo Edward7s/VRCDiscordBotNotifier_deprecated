@@ -53,7 +53,7 @@ namespace VRCDiscordBotNotifier.Utils
                         Thread.Sleep(200);
                         member = await BotSetup.Instance.DiscordGuild.GetMemberAsync(ulong.Parse(Config.Instance.JsonConfig.DmUsersId[j]));
                         dmChannel = await member.CreateDmChannelAsync();
-                        await dmChannel.SendMessageAsync(new DiscordEmbedBuilder() { Title = new StringBuilder().AppendFormat("{{ {0} }} Removed You From Friends, Id: {1}.", User["displayName"], User["id"]).ToString(), Color = DiscordColor.Red, Description = new StringBuilder().AppendFormat("UserId: {0}", _friends[i]).ToString() });
+                        await dmChannel.SendMessageAsync(new DiscordEmbedBuilder() { Title = new StringBuilder().AppendFormat("{{ {0} }} Removed You From Friends, Id: {1}.", User["displayName"], User["id"]).ToString(), Color = DiscordColor.Red, Description = new StringBuilder().AppendFormat("UserId: {0}", ids[i]).ToString() });
 
                     }
                 }
@@ -70,7 +70,7 @@ namespace VRCDiscordBotNotifier.Utils
                         Thread.Sleep(200);
                         member = await BotSetup.Instance.DiscordGuild.GetMemberAsync(ulong.Parse(Config.Instance.JsonConfig.DmUsersId[j]));
                         dmChannel = await member.CreateDmChannelAsync();
-                        await dmChannel.SendMessageAsync(new DiscordEmbedBuilder() { Title = new StringBuilder().AppendFormat("{{ {0} }} Added You, Id: {1}", User["displayName"], User["id"]).ToString(), Color = DiscordColor.Green, Description = new StringBuilder().AppendFormat("UserId: {0}", ids[i]).ToString() });
+                        await dmChannel.SendMessageAsync(new DiscordEmbedBuilder() { Title = new StringBuilder().AppendFormat("{{ {0} }} Added You, Id: {1}", User["displayName"], User["id"]).ToString(), Color = DiscordColor.Green, Description = new StringBuilder().AppendFormat("UserId: {0}", friendsText[i]).ToString() });
 
                     }
                 }
