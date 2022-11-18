@@ -41,6 +41,7 @@ namespace VRCDiscordBotNotifier.WebSocket
 
         public async Task Location(JObject jobj)
         {
+            _joinable = false;
             _user = JObject.Parse(jobj["user"].ToString());
             if (_lastId == _user["id"].ToString() && _lastInstance == jobj["location"].ToString())
             {
@@ -68,7 +69,7 @@ namespace VRCDiscordBotNotifier.WebSocket
                 _user = null;
                 return;
             }
-            if (jobj["world"].ToString().Length > 30)
+            if (jobj["world"].ToString().Length > 30 && _lastInstance != "private" && jobj["travelingToLocation"].ToString() != "private")
             {
                 _world = JObject.Parse(jobj["world"].ToString());
                 _worldInfo = new StringBuilder().AppendFormat("Name: {0}\nId: {1}\nAuthor Name: {2}", _world["name"], _world["id"], _world["authorName"]).ToString();
