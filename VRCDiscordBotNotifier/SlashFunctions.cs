@@ -94,6 +94,34 @@ namespace VRCDiscordBotNotifier
             await context.CreateResponseAsync($"You turned Online Users Messages: {Toggle(Config.Instance.JsonConfig.FriendsActivity)}");
         }
 
+        [SlashCommand("ApplicationId", "Set's The Application Id for the Rich Presence")] 
+        public async Task AppId(InteractionContext context, [Option("AplicationId","Your ApplicationId")] string str)
+        {
+            Config.Instance.JsonConfig.AplicationId = str;
+            Config.Instance.SaveConfig();
+            await context.CreateResponseAsync($"The AplicationId is {str}");
+        }
+
+
+
+        [SlashCommand("RichPresence", "Toggles the Rich Presnece")]
+        public async Task RichPresence(InteractionContext context)
+        {
+            if (Config.Instance.JsonConfig.AplicationId == String.Empty)
+            {
+                await context.CreateResponseAsync("Please use before Toggeling The Presence /ApplicationId {ID}");
+                return;
+            }
+            Config.Instance.JsonConfig.RichPresence = !Config.Instance.JsonConfig.RichPresence;
+            Config.Instance.SaveConfig();
+            if (Config.Instance.JsonConfig.RichPresence)
+                Task.Run(() => new RichPresence());
+
+
+            await context.CreateResponseAsync($"You turned The RichPresence: {Toggle(Config.Instance.JsonConfig.RichPresence)}");
+        }
+
+
         /*  [SlashCommand("MessageStatus", "Messages you on a channel if someone changed they're status")]
           public async Task MessageStatus(InteractionContext context)
           {

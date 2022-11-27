@@ -51,6 +51,8 @@ namespace VRCDiscordBotNotifier
             new Initialization();
             Task.Run(() => new NotificationsLoop().Loop());
             Task.Run(() => new WebSocket.VRCWebSocket());
+            if (Config.Instance.JsonConfig.RichPresence)
+                Task.Run(() => new RichPresence());
             await Task.Delay(-1);
         }
 
@@ -63,7 +65,7 @@ namespace VRCDiscordBotNotifier
                 if (e.Emoji != DiscordEmoji.FromUnicode("⬆️")) return;
 
                 var reactions = await e.Message.GetReactionsAsync(DiscordEmoji.FromUnicode("⬆️"));
-
+              
                 if (reactions.FirstOrDefault(x => x.Id == DiscordClientManager.CurrentUser.Id) == null)
                 {
                     reactions = null;

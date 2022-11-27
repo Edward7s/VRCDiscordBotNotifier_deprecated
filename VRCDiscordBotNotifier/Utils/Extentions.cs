@@ -1,4 +1,5 @@
 ﻿using DSharpPlus.Entities;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +19,27 @@ namespace VRCDiscordBotNotifier.Utils
             else
                 return channels.First(x => x.Name == Channel);
         }
+        public static string InstanceType(string type)
+        {
+            if ("hidden" == type)
+                return "Friends+";
+            if ("friends" == type)
+                return "Friends";
+            if ("private" == type)
+                return "Private";
 
+            return "Public";
+        }
+
+        public static string PlatformType(string platform)
+        {
+            if ("web" == platform)
+                return "Browser";
+            if ("standalonewindows" == platform)
+                return "PC";
+
+            return "Quest";
+        }
         public static string GetColorFromUserStatus(string State)
         {
             if (State == "active")

@@ -21,6 +21,9 @@ namespace VRCDiscordBotNotifier.Utils
             public bool FriendsActivity { get; set; }
             public bool FirstTime { get; set; }
             public bool DmOnFriendJoin { get; set; }
+            public bool RichPresence { get; set; }
+
+            public string AplicationId { get; set; }
 
         }
 

@@ -17,6 +17,7 @@ namespace VRCDiscordBotNotifier
         }
         static void Main(string[] args)
         {
+           // Task.Run(() => new Utils.FilesWatcher());
             Console.Title = "VRCDiscordBot";
             Task.Run(() => ClearMem());
             Console.ForegroundColor = ConsoleColor.Cyan;

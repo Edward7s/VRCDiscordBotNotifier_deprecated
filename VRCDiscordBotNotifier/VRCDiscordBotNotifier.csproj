@@ -18,4 +18,10 @@
     <PackageReference Include="WebSocketSharp" Version="1.0.3-rc11" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="DiscordRPC">
+      <HintPath>C:\Users\ediro\Desktop\tt\DiscordRPC.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

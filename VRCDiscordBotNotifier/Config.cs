@@ -89,6 +89,7 @@ namespace VRCDiscordBotNotifier
                     _props[i].SetValue(JsonConfig, false);
                     continue;
                 }
+                _props[i].SetValue(JsonConfig, string.Empty);
             }
 
 
