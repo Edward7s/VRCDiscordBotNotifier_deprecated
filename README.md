@@ -1,6 +1,7 @@
 # VRCDiscordBotNotifier
 # There will be new updates, make sure you always check the new versions.
 ### Right now there are some bugs.
+
 ## A discord bot that sends you notifications.
 
 ### 1 -> Online / Offline Friends;
@@ -13,8 +14,12 @@
 ## Setup
 ##### -Create a discord bot and invite it to your server (Make sure you don't invite anyone on the server if you don't want them to see your notifications.);
 ##### -Then launch the exe and follow the steps.
-##### -After that the bot should creat a new channel and ping @everyone there will be a message with how the bot works.
+##### -After that the bot should creat a new channel and ping @everyone there will be a message with how the bot works
 
+## To do:
+##### World history (invite youself to them if you react with an emoji);
+##### User Join Notification;
+##### USharpVideo Notification.
 ## Preview
 ![Img](https://user-images.githubusercontent.com/74219635/199615829-4ff31de5-47ca-473f-afa5-6c672193ae45.png)
 
