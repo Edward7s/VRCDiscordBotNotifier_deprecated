@@ -102,10 +102,15 @@ namespace VRCDiscordBotNotifier
                 if (e.Message.Embeds.Count == 0) return;
                 for (int i = 0; i < FriendsMethods.FriendList.Count; i++)
                 {
-                    if (!e.Message.Embeds[0].Description.Contains(FriendsMethods.FriendList[i])) continue;
-                    await e.Message.CreateReactionAsync(DiscordEmoji.FromUnicode("🖤"));
-                    Thread.Sleep(50);
-                    break;
+                    try
+                    {
+                        if (!e.Message.Embeds[0].Description.Contains(FriendsMethods.FriendList[i])) continue;
+                        await e.Message.CreateReactionAsync(DiscordEmoji.FromUnicode("🖤"));
+                        Thread.Sleep(50);
+                        break;
+                    }
+                    catch(Exception ex) { Console.WriteLine(ex); }
+                    
                 }
             }
             finally

@@ -17,6 +17,7 @@ namespace VRCDiscordBotNotifier.Utils
         private JObject _worldInfo { get; set; }
         private string _worldStringInfo { get; set; }
 
+        private string _lastWorld { get; set; } = string.Empty;
         private Assets _assets { get; set; } = new Assets();
 
         private DiscordRPC.RichPresence _richPresence { get; } = new DiscordRPC.RichPresence();
@@ -44,9 +45,10 @@ namespace VRCDiscordBotNotifier.Utils
             Thread.Sleep(300);
             _richPresence.State = new StringBuilder().AppendFormat("User: {0}, On: {1}", _localUser["displayName"] , Extentions.PlatformType((string)_localUser["presence"]["platform"])).ToString();
             _assets.LargeImageText = "Offline";
-            _assets.LargeImageKey = "https://i.imgur.com/TcYu7kO.png";
-            if (_localUser["presence"]["world"].ToString() != "offline" && _localUser["presence"]["world"].ToString() != "traveling")
+            _assets.LargeImageKey = "https://nocturnal-client.xyz/dribbble.gif";
+            if (_localUser["presence"]["world"].ToString() != "offline" && _localUser["presence"]["world"].ToString() != "traveling" && _lastWorld != _localUser["presence"]["world"].ToString())
             {
+                _lastWorld = _localUser["presence"]["world"].ToString();
                 Thread.Sleep(300);
                 _worldInfo = JObject.Parse(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.Worlds + _localUser["presence"]["world"]));
                 _worldStringInfo = new StringBuilder().AppendFormat("In: {0}, ", Extentions.InstanceType((string)_localUser["presence"]["instanceType"])).ToString();

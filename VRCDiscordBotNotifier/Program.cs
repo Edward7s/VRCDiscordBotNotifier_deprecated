@@ -1,8 +1,10 @@
 ﻿using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
+using System.Diagnostics;
 using System.Text;
 using VRCDiscordBotNotifier.Utils;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace VRCDiscordBotNotifier
 {
@@ -17,7 +19,21 @@ namespace VRCDiscordBotNotifier
         }
         static void Main(string[] args)
         {
-           // Task.Run(() => new Utils.FilesWatcher());
+         /*   AppDomain.CurrentDomain.FirstChanceException += (s, e) =>
+            {
+                Console.WriteLine("---------------------Exception---------------------");
+                Console.WriteLine(e.Exception.ToString());
+                Console.WriteLine("---------------------------------------------------");
+            };*/
+            AppDomain.CurrentDomain.UnhandledException += (s, e) =>
+            {
+                Console.WriteLine("-----------------UnhandledException-----------------");
+                Console.WriteLine(e.ToString());
+                Console.WriteLine("----------------------------------------------------");
+            }; 
+
+
+            // Task.Run(() => new Utils.FilesWatcher());
             Console.Title = "VRCDiscordBot";
             Task.Run(() => ClearMem());
             Console.ForegroundColor = ConsoleColor.Cyan;
@@ -27,6 +43,8 @@ namespace VRCDiscordBotNotifier
             new BotSetup();
             Console.ReadLine();
         }
-      
+
+
+       
     }
 }
