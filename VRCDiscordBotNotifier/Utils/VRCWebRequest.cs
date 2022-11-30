@@ -49,38 +49,46 @@ namespace VRCDiscordBotNotifier.Utils
         }
         public string SendVRCWebReq(RequestType req, string url, object? payload = null)
         {
-            try
+            bool toggle = true;
+            while (toggle)
             {
-                s_payload = string.Empty;
-                if (payload != null)
-                    s_payload = JsonConvert.SerializeObject(payload);
-                _httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
-                _httpWebRequest.CookieContainer = s_cookies;
-                _httpWebRequest.Method = req.ToString();
-                _httpWebRequest.UserAgent = "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Mobile Safari/537.36";
-                _httpWebRequest.ContentType = "application/json";
-                _httpWebRequest.Accept = "application/json, text/plain, */*";
-                _httpWebRequest.SendChunked = true;
-                _httpWebRequest.ContentLength = s_payload == null ? 0 : s_payload.Length;
-                _httpWebRequest.AutomaticDecompression = DecompressionMethods.GZip;
-                _httpWebRequest.Headers.Add(HttpRequestHeader.AcceptEncoding, "gzip, deflate, br");
-                if (s_payload != string.Empty)
+                try
                 {
-                    using (var writer = new StreamWriter(_httpWebRequest.GetRequestStream(), Encoding.UTF8))
-                        writer.Write(s_payload);
+                    s_payload = string.Empty;
+                    if (_httpWebRequest != null)
+                        _httpWebRequest = null;
+                    if (payload != null)
+                        s_payload = JsonConvert.SerializeObject(payload);
+                    _httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
+                    _httpWebRequest.CookieContainer = s_cookies;
+                    _httpWebRequest.Method = req.ToString();
+                    _httpWebRequest.UserAgent = "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Mobile Safari/537.36";
+                    _httpWebRequest.ContentType = "application/json";
+                    _httpWebRequest.Accept = "application/json, text/plain, */*";
+                    _httpWebRequest.SendChunked = true;
+                    _httpWebRequest.ContentLength = s_payload == null ? 0 : s_payload.Length;
+                    _httpWebRequest.AutomaticDecompression = DecompressionMethods.GZip;
+                    _httpWebRequest.Headers.Add(HttpRequestHeader.AcceptEncoding, "gzip, deflate, br");
+                    if (s_payload != string.Empty)
+                    {
+                        using (var writer = new StreamWriter(_httpWebRequest.GetRequestStream(), Encoding.UTF8))
+                            writer.Write(s_payload);
+                    }
+                    WebResponse = (HttpWebResponse)_httpWebRequest.GetResponse();
+                    toggle = false;
+                    using (var reader = new StreamReader(WebResponse.GetResponseStream(), ASCIIEncoding.UTF8))
+                        return reader.ReadToEnd();
                 }
-                WebResponse = (HttpWebResponse)_httpWebRequest.GetResponse();
-                using (var reader = new StreamReader(WebResponse.GetResponseStream(), ASCIIEncoding.UTF8))
-                    return reader.ReadToEnd();
+                catch(Exception ex)
+                {
+                    _httpWebRequest = null;
+                    if (WebResponse != null)
+                         WebResponse.Dispose();
+                    Console.WriteLine("ERROR ON REQ: {0}", url);
+                }
+                Thread.Sleep(600);
             }
-            catch 
-            {
-                WebResponse.Dispose();
-                
-                Thread.Sleep(500);
-                Console.WriteLine("ERROR ON REQ: {0}", url);
-                return SendVRCWebReq(req, url, payload);
-            }
+            return null;
           
         }
     }

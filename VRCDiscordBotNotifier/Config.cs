@@ -34,9 +34,9 @@ namespace VRCDiscordBotNotifier
         public Config()
         {
             Instance = this;
-            if (!File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + _fileName))
-            {
-                File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + _fileName, JsonConvert.SerializeObject(new Json.Config()
+
+            Extentions.CheckFileSanity(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + _fileName,
+                JsonConvert.SerializeObject(new Json.Config()
                 {
                     AuthCookie = String.Empty,
                     UserId = "AutoChange",
@@ -48,7 +48,7 @@ namespace VRCDiscordBotNotifier
                     FriendsActivity = false,
                     FirstTime = true,
                 }));
-            }
+
             JsonConfig = JsonConvert.DeserializeObject<Json.Config>(File.ReadAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + _fileName));
 
             _props = typeof(Json.Config).GetProperties();
@@ -60,7 +60,7 @@ namespace VRCDiscordBotNotifier
             }
             Thread.Sleep(100);
             new VRCWebRequest();
-            if (!File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + FriendsFile))
+            if (!File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + FriendsFile) || File.ReadAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + FriendsFile) == string.Empty)
             {
                 string FriendsList = string.Empty;
                 var jobject = JObject.Parse(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.LocalUser));
@@ -70,10 +70,7 @@ namespace VRCDiscordBotNotifier
                 jobject = null;
                 FriendsList = null;
             }
-            if (!File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Notifications))
-                File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Notifications, VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get,VRCInfo.VRCApiLink + VRCInfo.EndPoints.Notifications));
-
-
+            Extentions.CheckFileSanity(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Notifications,VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.Notifications));
             RegistryKey startup = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
             if (startup.GetValue("VRCDiscordBotNotifier") == null)
                 startup.SetValue("VRCDiscordBotNotifier", Directory.GetCurrentDirectory() + "\\VRCDiscordBotNotifier.exe");

@@ -24,6 +24,7 @@ namespace VRCDiscordBotNotifier.Utils
         {
             if (Config.Instance.JsonConfig.DmNewNotifications)
             {
+           
                 s_notificationsArr = JsonConvert.DeserializeObject<Json.Notification[]>(File.ReadAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Config.Instance.Notifications));
                 s_apiNotifications = VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.Notifications);
                 s_apiNotificationsArr = JsonConvert.DeserializeObject<Json.Notification[]>(s_apiNotifications);

@@ -10,13 +10,7 @@ namespace VRCDiscordBotNotifier
 {
     internal class Program
     {
-        private static void ClearMem()
-        {
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            Thread.Sleep(2000);
-            ClearMem();
-        }
+  
         static void Main(string[] args)
         {
          /*   AppDomain.CurrentDomain.FirstChanceException += (s, e) =>
@@ -35,7 +29,15 @@ namespace VRCDiscordBotNotifier
 
             // Task.Run(() => new Utils.FilesWatcher());
             Console.Title = "VRCDiscordBot";
-            Task.Run(() => ClearMem());
+            Task.Run(() =>
+            {
+                while (true)
+                {
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                    Thread.Sleep(2000);
+                }            
+            });
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("Initializing Config, This might take a bit depending on your enthernet speed and how much vrc friends you have.");
             new Config();
