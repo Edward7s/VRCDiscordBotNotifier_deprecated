@@ -12,6 +12,8 @@ namespace VRCDiscordBotNotifier.Utils
     internal class VRCWebRequest
     {
         public static VRCWebRequest Instance { get; set; }
+        public HttpWebRequest _httpWebRequest { get; set; }
+
         private CookieContainer s_cookies = new CookieContainer();
         public HttpWebResponse WebResponse { get; private set; }
         private string s_payload { get; set; } = string.Empty;
@@ -52,29 +54,29 @@ namespace VRCDiscordBotNotifier.Utils
                 s_payload = string.Empty;
                 if (payload != null)
                     s_payload = JsonConvert.SerializeObject(payload);
-                var VRCRequest = (HttpWebRequest)WebRequest.Create(url);
-                VRCRequest.CookieContainer = s_cookies;
-                VRCRequest.Method = req.ToString();
-                VRCRequest.UserAgent = "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Mobile Safari/537.36";
-                VRCRequest.ContentType = "application/json";
-                VRCRequest.Accept = "application/json, text/plain, */*";
-                VRCRequest.SendChunked = true;
-                VRCRequest.ContentLength = s_payload == null ? 0 : s_payload.Length;
-                VRCRequest.AutomaticDecompression = DecompressionMethods.GZip;
-                VRCRequest.Headers.Add(HttpRequestHeader.AcceptEncoding, "gzip, deflate, br");
+                _httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
+                _httpWebRequest.CookieContainer = s_cookies;
+                _httpWebRequest.Method = req.ToString();
+                _httpWebRequest.UserAgent = "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Mobile Safari/537.36";
+                _httpWebRequest.ContentType = "application/json";
+                _httpWebRequest.Accept = "application/json, text/plain, */*";
+                _httpWebRequest.SendChunked = true;
+                _httpWebRequest.ContentLength = s_payload == null ? 0 : s_payload.Length;
+                _httpWebRequest.AutomaticDecompression = DecompressionMethods.GZip;
+                _httpWebRequest.Headers.Add(HttpRequestHeader.AcceptEncoding, "gzip, deflate, br");
                 if (s_payload != string.Empty)
                 {
-                    using (var writer = new StreamWriter(VRCRequest.GetRequestStream(), Encoding.UTF8))
+                    using (var writer = new StreamWriter(_httpWebRequest.GetRequestStream(), Encoding.UTF8))
                         writer.Write(s_payload);
                 }
-                WebResponse = (HttpWebResponse)VRCRequest.GetResponse();
-                VRCRequest = null;
+                WebResponse = (HttpWebResponse)_httpWebRequest.GetResponse();
                 using (var reader = new StreamReader(WebResponse.GetResponseStream(), ASCIIEncoding.UTF8))
                     return reader.ReadToEnd();
             }
-            catch
+            catch 
             {
                 WebResponse.Dispose();
+                
                 Thread.Sleep(500);
                 Console.WriteLine("ERROR ON REQ: {0}", url);
                 return SendVRCWebReq(req, url, payload);
