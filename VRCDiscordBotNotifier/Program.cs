@@ -13,12 +13,13 @@ namespace VRCDiscordBotNotifier
   
         static void Main(string[] args)
         {
-         /*   AppDomain.CurrentDomain.FirstChanceException += (s, e) =>
-            {
-                Console.WriteLine("---------------------Exception---------------------");
-                Console.WriteLine(e.Exception.ToString());
-                Console.WriteLine("---------------------------------------------------");
-            };*/
+            /*   AppDomain.CurrentDomain.FirstChanceException += (s, e) =>
+               {
+                   Console.WriteLine("---------------------Exception---------------------");
+                   Console.WriteLine(e.Exception.ToString());
+                   Console.WriteLine("---------------------------------------------------");
+               };*/
+            new VersionChecker();
             AppDomain.CurrentDomain.UnhandledException += (s, e) =>
             {
                 Console.WriteLine("-----------------UnhandledException-----------------");

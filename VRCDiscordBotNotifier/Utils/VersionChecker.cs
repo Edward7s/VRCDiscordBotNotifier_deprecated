@@ -1,0 +1,30 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Text;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+using System.Diagnostics;
+namespace VRCDiscordBotNotifier.Utils
+{
+    internal class VersionChecker
+    {
+        private string _version { get; } = "V1.6";
+        public VersionChecker()
+        {
+            if (!Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\UpdatorNocturnal"))
+                Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\UpdatorNocturnal");
+
+            if (!File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\UpdatorNocturnal\\AutoUpdator.exe"))
+                using (WebClient wc = new WebClient())
+                    wc.DownloadFile("https://github.com/Edward7s/AutoUpdatorForDiscordBot/releases/download/InitialVersion/AutoUpdator.exe", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\UpdatorNocturnal\\AutoUpdator.exe");
+
+            Process updator = new Process();
+            updator.StartInfo.Arguments = _version;  
+            updator.StartInfo.FileName = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\UpdatorNocturnal\\AutoUpdator.exe";
+            updator.Start();
+        }
+
+    }
+}
