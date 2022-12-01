@@ -100,6 +100,8 @@ namespace VRCDiscordBotNotifier
             {
                 if (e.Author.Id != DiscordClientManager.CurrentUser.Id) return;
                 if (e.Message.Embeds.Count == 0) return;
+                if (e.Message.Embeds[0].Description == null) return;
+
                 for (int i = 0; i < FriendsMethods.FriendList.Count; i++)
                 {
                     try

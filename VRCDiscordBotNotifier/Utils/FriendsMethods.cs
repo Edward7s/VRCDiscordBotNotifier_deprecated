@@ -27,7 +27,7 @@ namespace VRCDiscordBotNotifier.Utils
             FriendList.Clear();
             for (int i = 0; i < _users.Count; i++)
             {
-                Thread.Sleep(10);
+                Thread.Sleep(20);
                 FriendList.Add(_users[i].favoriteId);
             }
             _users = null;

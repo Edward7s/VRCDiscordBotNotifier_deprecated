@@ -13,7 +13,6 @@ namespace VRCDiscordBotNotifier.WebSocket
 {
     internal class WebSocketMessageManager
     {
-        private JObject _user { get; set; }
         private JObject _world { get; set; }
 
         private string _lastInstance { get; set; }
@@ -22,9 +21,7 @@ namespace VRCDiscordBotNotifier.WebSocket
         private DiscordDmChannel _dm { get; set; }
 
         private string _worldInfo { get; set; }
-        private DiscordMessage _message { get; set; }
 
-        private bool _joinable { get; set; }
         public async Task Offline(string id) =>
             await Initialization.Instance.ChannelActivty.SendMessageAsync(new DiscordEmbedBuilder() { Title = "{ " + JObject.FromObject(JObject.Parse(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.UserEndPoint + id)))["displayName"].ToString() + " } Is now offline.", Description = "UserId: " + id, Color = DiscordColor.Gray });
 
@@ -41,14 +38,14 @@ namespace VRCDiscordBotNotifier.WebSocket
 
         public async Task Location(JObject jobj)
         {
-            _joinable = false;
-            _user = JObject.Parse(jobj["user"].ToString());
-            if (_lastId == _user["id"].ToString() && _lastInstance == jobj["location"].ToString())
+            bool joinable = false;
+            JObject user = JObject.Parse(jobj["user"].ToString());
+            if (_lastId == user["id"].ToString() && _lastInstance == jobj["location"].ToString())
             {
-                _user = null;
+                user = null;
                 return;
             }
-            _lastId = _user["id"].ToString();
+            _lastId = user["id"].ToString();
             _lastInstance = jobj["location"].ToString();
 
             if (Config.Instance.JsonConfig.DmOnFriendJoin && FriendsMethods.CurrentInstanceId != "offline:offline" && jobj["travelingToLocation"].ToString() == FriendsMethods.CurrentInstanceId)
@@ -58,38 +55,35 @@ namespace VRCDiscordBotNotifier.WebSocket
                     Thread.Sleep(300);
                     _member = await BotSetup.Instance.DiscordGuild.GetMemberAsync(ulong.Parse(Config.Instance.JsonConfig.DmUsersId[j]));
                     _dm = await _member.CreateDmChannelAsync();
-                    await _dm.SendMessageAsync(new DiscordEmbedBuilder() { Title = new StringBuilder().AppendFormat("{{ {0} }} Is Joining You.", _user["displayName"]).ToString(), Color = DiscordColor.Cyan });
+                    await _dm.SendMessageAsync(new DiscordEmbedBuilder() { Title = new StringBuilder().AppendFormat("{{ {0} }} Is Joining You.", user["displayName"]).ToString(), Color = DiscordColor.Cyan });
                 }
             }
 
-
-
-            if (_user["status"].ToString() == "ask me" || _user["status"].ToString() == "busy")
+            if (user["status"].ToString() == "ask me" || user["status"].ToString() == "busy")
             {
-                _user = null;
+                user = null;
                 return;
             }
             if (jobj["world"].ToString().Length > 30 && _lastInstance != "private" && jobj["travelingToLocation"].ToString() != "private")
             {
                 _world = JObject.Parse(jobj["world"].ToString());
                 _worldInfo = new StringBuilder().AppendFormat("Name: {0}\nId: {1}\nAuthor Name: {2}", _world["name"], _world["id"], _world["authorName"]).ToString();
-                _joinable = true;
+                joinable = true;
             }
 
-            _message = await Initialization.Instance.ChannelActivty.SendMessageAsync(new DiscordEmbedBuilder()
+            DiscordMessage message = await Initialization.Instance.ChannelActivty.SendMessageAsync(new DiscordEmbedBuilder()
             {
-                Title = new StringBuilder().AppendFormat("{{ {0} }} Changed His Location.", _user["displayName"]).ToString(),
-                Color = new DiscordColor(Extentions.GetColorFromUserStatus(_user["status"].ToString())),
-                Description = new StringBuilder().AppendFormat("UserId: {0}\nState: {1}\nStatus: {2}\nLocation: {3}\nTraveling to: {4}\n{5}", _lastId, _user["status"], _user["statusDescription"], _lastInstance, jobj["travelingToLocation"], _worldInfo).ToString(),
-                Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail() { Url = _joinable ? _world["imageUrl"].ToString() : "https://nocturnal-client.xyz/cl/PrivateWorld.png", Height = 800, Width = 800 }
+                Title = new StringBuilder().AppendFormat("{{ {0} }} Changed His Location.", user["displayName"]).ToString(),
+                Color = new DiscordColor(Extentions.GetColorFromUserStatus(user["status"].ToString())),
+                Description = new StringBuilder().AppendFormat("UserId: {0}\nState: {1}\nStatus: {2}\nLocation: {3}\nTraveling to: {4}\n{5}", _lastId, user["status"], user["statusDescription"], _lastInstance, jobj["travelingToLocation"], _worldInfo).ToString(),
+                Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail() { Url = joinable ? _world["imageUrl"].ToString() : "https://nocturnal-client.xyz/cl/PrivateWorld.png", Height = 800, Width = 800 }
             });
-            _user = null;
-            _worldInfo = string.Empty;
+            user = null;
             Thread.Sleep(700);
-            if (_joinable)
+            if (joinable)
             {
-                await _message.CreateReactionAsync(DiscordEmoji.FromUnicode("⬆️"));
-                _message = null;
+                await message.CreateReactionAsync(DiscordEmoji.FromUnicode("⬆️"));
+                message = null;
             }
 
 
