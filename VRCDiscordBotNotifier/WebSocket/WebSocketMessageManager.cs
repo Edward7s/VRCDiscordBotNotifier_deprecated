@@ -76,7 +76,7 @@ namespace VRCDiscordBotNotifier.WebSocket
                 Title = new StringBuilder().AppendFormat("{{ {0} }} Changed His Location.", user["displayName"]).ToString(),
                 Color = new DiscordColor(Extentions.GetColorFromUserStatus(user["status"].ToString())),
                 Description = new StringBuilder().AppendFormat("UserId: {0}\nState: {1}\nStatus: {2}\nLocation: {3}\nTraveling to: {4}\n{5}", _lastId, user["status"], user["statusDescription"], _lastInstance, jobj["travelingToLocation"], _worldInfo).ToString(),
-                Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail() { Url = joinable ? _world["imageUrl"].ToString() : "https://nocturnal-client.xyz/cl/PrivateWorld.png", Height = 800, Width = 800 }
+                Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail() { Url = joinable ? _world["imageUrl"].ToString() : "https://raw.githubusercontent.com/Edward7s/AutoUpdatorForDiscordBot/master/PrivateWorld.png", Height = 800, Width = 800 }
             });
             user = null;
             Thread.Sleep(700);

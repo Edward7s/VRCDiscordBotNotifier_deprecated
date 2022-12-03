@@ -4,6 +4,8 @@ using DSharpPlus.Entities;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,6 +18,9 @@ namespace VRCDiscordBotNotifier.Utils
         private JObject _localUser { get; set; }
         private JObject _worldInfo { get; set; }
         private string _worldStringInfo { get; set; }
+
+        private DateTime _time { get; set; }
+
 
         private string _lastWorld { get; set; } = string.Empty;
         private Assets _assets { get; set; } = new Assets();
@@ -50,23 +55,41 @@ namespace VRCDiscordBotNotifier.Utils
                 if (_lastWorld != _localUser["presence"]["world"].ToString())
                 {
                     _assets.LargeImageText = "Offline";
-                    _assets.LargeImageKey = "https://nocturnal-client.xyz/dribbble.gif";
-                    if (_localUser["presence"]["world"].ToString() != "offline" && _localUser["presence"]["world"].ToString() != "traveling")
+                    _assets.LargeImageKey = "https://raw.githubusercontent.com/Edward7s/AutoUpdatorForDiscordBot/master/dribbble.gif";
+                    if (_localUser["presence"]["world"].ToString() == "traveling")
                     {
+                        _assets.LargeImageKey = "https://raw.githubusercontent.com/Edward7s/AutoUpdatorForDiscordBot/master/Train.gif";
+                        _assets.LargeImageText = "Joining A World";
+                        _worldStringInfo = "Joining A World, ";
+                    }
+                    else if (_localUser["presence"]["world"].ToString() != "offline")
+                    {
+                        _time = DateTime.Now;
                         _lastWorld = _localUser["presence"]["world"].ToString();
                         Thread.Sleep(300);
                         _worldInfo = JObject.Parse(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.Worlds + _localUser["presence"]["world"]));
-                        _worldStringInfo = new StringBuilder().AppendFormat("In: {0}, ", Extentions.InstanceType((string)_localUser["presence"]["instanceType"])).ToString();
+                        _worldStringInfo = String.Format("In: {0} ", Extentions.InstanceType((string)_localUser["presence"]["instanceType"]));
                         _assets.LargeImageText = new StringBuilder().AppendFormat("| {0} | Cap: {1} | Occupants: {2} | Fav: {3} | Visits: {4} | Heat: {5} | By: {6} |", _worldInfo["name"], _worldInfo["capacity"], _worldInfo["occupants"], _worldInfo["favorites"], _worldInfo["visits"], _worldInfo["heat"], _worldInfo["authorName"]).ToString();
                         _assets.LargeImageKey = _worldInfo["imageUrl"].ToString();
                     }
-                    _richPresence.Details = new StringBuilder().AppendFormat("{0}Status: {1}, Type: {2}", _worldStringInfo, _localUser["statusDescription"], _localUser["status"]).ToString();
+                    else
+                        _worldStringInfo = string.Empty;
+
+
+                    if (_worldStringInfo != string.Empty && _worldStringInfo != "Joining A World, ")  
+                         _richPresence.Details =string.Format("{0}For: {1}, State: {2}", _worldStringInfo, ((TimeSpan)(DateTime.Now - _time)).ToString(@"hh\:mm\:ss"), _localUser["status"]).ToString();
+                    else
+                        _richPresence.Details = new StringBuilder().AppendFormat("{0}State: {1}", _worldStringInfo, _localUser["status"]).ToString();
+
                 }
+                if (_richPresence.Details.Contains("For:"))
+                    _richPresence.Details = string.Format("{0}For: {1}, State: {2}", _worldStringInfo, ((TimeSpan)(DateTime.Now - _time)).ToString(@"hh\:mm\:ss"), _localUser["status"]).ToString();
+                else
+                    _worldStringInfo = string.Empty;
 
                 _assets.SmallImageKey = _localUser["currentAvatarImageUrl"].ToString();
                 _assets.SmallImageText = _localUser["allowAvatarCopying"].ToString() == "True" ? "Cloning On." : "Cloning Off";
                 _client.SetPresence(_richPresence);
-                _worldStringInfo = string.Empty;
                 _client.Invoke();
                 Thread.Sleep(5000);
             }
