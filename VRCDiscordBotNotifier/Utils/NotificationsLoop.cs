@@ -25,7 +25,7 @@ namespace VRCDiscordBotNotifier.Utils
             if (Config.Instance.JsonConfig.DmNewNotifications)
             {
            
-                s_notificationsArr = JsonConvert.DeserializeObject<Json.Notification[]>(File.ReadAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Config.Instance.Notifications));
+                s_notificationsArr = JsonConvert.DeserializeObject<Json.Notification[]>(Filemanager.ReadFile(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Config.Instance.Notifications));
                 s_apiNotifications = VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.Notifications);
                 s_apiNotificationsArr = JsonConvert.DeserializeObject<Json.Notification[]>(s_apiNotifications);
                 for (int i = 0; i < s_apiNotificationsArr.Length; i++)
@@ -37,10 +37,10 @@ namespace VRCDiscordBotNotifier.Utils
                         Thread.Sleep(200);
                         s_member = await BotSetup.Instance.DiscordGuild.GetMemberAsync(ulong.Parse(Config.Instance.JsonConfig.DmUsersId[j]));
                         s_dm = await s_member.CreateDmChannelAsync();
-                        await s_dm.SendMessageAsync(new DiscordEmbedBuilder() { Title = new StringBuilder().AppendFormat("{{ {0} }} Sent you a {1}", s_apiNotificationsArr[i].senderUsername, s_apiNotificationsArr[i].type).ToString(),Description = new StringBuilder().AppendFormat("Created at: {0}", s_apiNotificationsArr[i].created_at).ToString(), Color = DiscordColor.Purple });
+                        await s_dm.SendMessageAsync(new DiscordEmbedBuilder() { Title = String.Format("{{ {0} }} Sent you a {1}", s_apiNotificationsArr[i].senderUsername, s_apiNotificationsArr[i].type).ToString(),Description = String.Format("Created at: {0}\n{1}", DateTime.Parse(s_apiNotificationsArr[i].created_at).ToLocalTime(), s_apiNotificationsArr[i].details == string.Empty ? string.Empty : s_apiNotificationsArr[i].details).ToString(), Color = DiscordColor.Purple });
                     }
                 }
-                File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Config.Instance.Notifications, s_apiNotifications);
+                Filemanager.WriteFile(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Config.Instance.Notifications, s_apiNotifications);
             }
             Thread.Sleep(17500);
             Loop();

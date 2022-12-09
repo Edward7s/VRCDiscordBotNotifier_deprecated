@@ -8,11 +8,10 @@ using System.Threading.Tasks;
 using VRCDiscordBotNotifier.Utils;
 using System.Diagnostics;
 using System.Reflection;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel;
 using Microsoft.Win32;
-
+using VRCDiscordBotNotifier.Utils;
 namespace VRCDiscordBotNotifier
 {
     internal class Config
@@ -26,9 +25,8 @@ namespace VRCDiscordBotNotifier
         public string Notifications { get; } = "\\NotificationsBot.json";
 
         public void SaveConfig() =>
-            File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + _fileName, JsonConvert.SerializeObject(JsonConfig));
-
-
+            Filemanager.WriteFile(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + _fileName, JsonConvert.SerializeObject(JsonConfig));
+       
         public List<Json.User> UsersArr { get; } = new List<Json.User>();
         private PropertyInfo[] _props { get; set; }
         public Config()
@@ -49,7 +47,7 @@ namespace VRCDiscordBotNotifier
                     FirstTime = true,
                 }));
 
-            JsonConfig = JsonConvert.DeserializeObject<Json.Config>(File.ReadAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + _fileName));
+            JsonConfig = JsonConvert.DeserializeObject<Json.Config>(Filemanager.ReadFile(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + _fileName));
 
             _props = typeof(Json.Config).GetProperties();
             for (int i = 0; i < _props.Length; i++)
@@ -60,13 +58,13 @@ namespace VRCDiscordBotNotifier
             }
             Thread.Sleep(100);
             new VRCWebRequest();
-            if (!File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + FriendsFile) || File.ReadAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + FriendsFile) == string.Empty)
+            if (!File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + FriendsFile) || Filemanager.ReadFile(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + FriendsFile) == string.Empty)
             {
                 string FriendsList = string.Empty;
                 var jobject = JObject.Parse(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.LocalUser));
                 for (int i = 0; i < jobject["friends"].ToArray().Length; i++)
                     FriendsList += jobject["friends"][i].ToString() + "\n";
-                File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + FriendsFile, FriendsList);
+                Filemanager.WriteFile(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + FriendsFile, FriendsList);
                 jobject = null;
                 FriendsList = null;
             }
@@ -93,8 +91,9 @@ namespace VRCDiscordBotNotifier
         }
         private void Register()
         {
+            
             Console.Clear();
-            JsonConfig = JsonConvert.DeserializeObject<Json.Config>(File.ReadAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + _fileName));
+            JsonConfig = JsonConvert.DeserializeObject<Json.Config>(Filemanager.ReadFile(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + _fileName));
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("Please Enter Your Discord Bot Token.");
             JsonConfig.BotToken = Console.ReadLine().Trim();
@@ -102,7 +101,7 @@ namespace VRCDiscordBotNotifier
             JsonConfig.DiscordServerId = Console.ReadLine().Trim();
             Console.WriteLine("Please Enter Your VRChat AuthCookie.");
             JsonConfig.AuthCookie = Console.ReadLine().Trim();
-            File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + _fileName, JsonConvert.SerializeObject(JsonConfig));
+            Filemanager.WriteFile(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + _fileName, JsonConvert.SerializeObject(JsonConfig));
             CheckVRCUser();
         }
 
@@ -119,12 +118,12 @@ namespace VRCDiscordBotNotifier
                 Console.WriteLine();
                 Console.WriteLine("Please Enter Your VRChat AuthCookie.");
                 JsonConfig.AuthCookie = Console.ReadLine().Trim();
-                File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + _fileName, JsonConvert.SerializeObject(JsonConfig));
+                Filemanager.WriteFile(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + _fileName, JsonConvert.SerializeObject(JsonConfig));
                 CheckVRCUser();
                 return;
             }
             JsonConfig.UserId = JObject.Parse(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.LocalUser))["id"].ToString();
-            File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + _fileName, JsonConvert.SerializeObject(JsonConfig));
+            Filemanager.WriteFile(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + _fileName, JsonConvert.SerializeObject(JsonConfig));
         }
     }
 }

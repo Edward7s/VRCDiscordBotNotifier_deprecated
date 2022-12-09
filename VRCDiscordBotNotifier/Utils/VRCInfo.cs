@@ -23,6 +23,9 @@ namespace VRCDiscordBotNotifier.Utils
             public static string Notifications { get; } = "auth/user/notifications?n=100";
             public static string SelfInvite { get; } = "invite/myself/to/"; /*  instance id  */
 
+            public static string AcceptFriendReq(string ReqId) =>
+                string.Format("auth/user/notifications/{0}/accept", ReqId);
+           
 
             //notifications?n=100
 

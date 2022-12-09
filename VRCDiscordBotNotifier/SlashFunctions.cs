@@ -1,5 +1,6 @@
 ﻿using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -78,7 +79,7 @@ namespace VRCDiscordBotNotifier
         [SlashCommand("FriendsActivity", "Messages you if anything happens to one of your friends.")]
         public async Task MessageOn(InteractionContext context)
         {
-           
+
             Config.Instance.JsonConfig.FriendsActivity = !Config.Instance.JsonConfig.FriendsActivity;
             if (Config.Instance.JsonConfig.FriendsActivity)
                 Initialization.Instance.ChannelActivty = await Extentions.GetOrCreateChannel("n_activity");
@@ -86,7 +87,7 @@ namespace VRCDiscordBotNotifier
             {
                 var channels = await context.Guild.GetChannelsAsync();
                 if (channels.FirstOrDefault(x => x.Name != "n_activity") != null)
-                  await channels.First(x => x.Name != "n_activity").DeleteAsync();
+                    await channels.First(x => x.Name != "n_activity").DeleteAsync();
                 channels = null;
             }
             Config.Instance.SaveConfig();
@@ -94,8 +95,8 @@ namespace VRCDiscordBotNotifier
             await context.CreateResponseAsync($"You turned Online Users Messages: {Toggle(Config.Instance.JsonConfig.FriendsActivity)}");
         }
 
-        [SlashCommand("ApplicationId", "Set's The Application Id for the Rich Presence")] 
-        public async Task AppId(InteractionContext context, [Option("AplicationId","Your ApplicationId")] string str)
+        [SlashCommand("ApplicationId", "Set's The Application Id for the Rich Presence")]
+        public async Task AppId(InteractionContext context, [Option("AplicationId", "Your ApplicationId")] string str)
         {
             Config.Instance.JsonConfig.AplicationId = str;
             Config.Instance.SaveConfig();
@@ -120,6 +121,34 @@ namespace VRCDiscordBotNotifier
 
             await context.CreateResponseAsync($"You turned The RichPresence: {Toggle(Config.Instance.JsonConfig.RichPresence)}");
         }
+
+
+        [SlashCommand("FriendRequests", "Checks All Your Friend Requests")]
+        public async Task FriendRequests(InteractionContext context)
+        {
+            var friends = JsonConvert.DeserializeObject<Json.Notification[]>(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.Notifications)).Where(x => x.type == "friendRequest").ToArray();
+            StringBuilder friendsString = new StringBuilder();
+            for (int i = 0; i < friends.Length; i++)
+            {
+                friendsString.AppendFormat(" [{0} > {1}] ", i, friends[i].senderUsername);
+                if (i % 2 != 0)
+                    friendsString.Append("\n");
+            }
+            await context.CreateResponseAsync(new DiscordEmbedBuilder() { Title = String.Format("Friends Requests > {0}", friends.Length), Description = friendsString.ToString(), Color = DiscordColor.Green });
+        }
+        [SlashCommand("AcceptFriend", "Accepts A Friend Request")]
+        public async Task AcceptFriend(InteractionContext context, [Option("FriendNumber", "The Number Of The User.")] long number)
+        {
+            var friends = JsonConvert.DeserializeObject<Json.Notification[]>(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.Notifications)).Where(x => x.type == "friendRequest").ToArray();
+            if (friends.Length < number)
+            {
+                await context.CreateResponseAsync("You Don't Have That Much Friend Requests.");
+                return;
+            }
+            VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Put, VRCInfo.VRCApiLink + VRCInfo.EndPoints.AcceptFriendReq(friends[number].id));
+            await context.CreateResponseAsync(new DiscordEmbedBuilder() { Title = String.Format("Accepted [{0}] Friends Request", friends[number].senderUsername), Color = DiscordColor.Green });
+        }
+
 
 
         /*  [SlashCommand("MessageStatus", "Messages you on a channel if someone changed they're status")]

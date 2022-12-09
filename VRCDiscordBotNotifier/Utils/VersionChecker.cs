@@ -10,7 +10,7 @@ namespace VRCDiscordBotNotifier.Utils
 {
     internal class VersionChecker
     {
-        private string _version { get; } = "V1.8";
+        public static string Version { get; } = "V1.9";
         public VersionChecker()
         {
             if (!Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\UpdatorNocturnal"))
@@ -21,7 +21,7 @@ namespace VRCDiscordBotNotifier.Utils
                     wc.DownloadFile("https://github.com/Edward7s/AutoUpdatorForDiscordBot/releases/download/InitialVersion/AutoUpdator.exe", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\UpdatorNocturnal\\AutoUpdator.exe");
 
             Process updator = new Process();
-            updator.StartInfo.Arguments = _version;  
+            updator.StartInfo.Arguments = Version;  
             updator.StartInfo.FileName = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\UpdatorNocturnal\\AutoUpdator.exe";
             updator.Start();
         }

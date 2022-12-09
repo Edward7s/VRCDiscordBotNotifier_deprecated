@@ -24,11 +24,11 @@ namespace VRCDiscordBotNotifier.Utils
         {
             if (!File.Exists(path))
             {
-                File.WriteAllText(path, content);
+                Filemanager.WriteFile(path, content);
                 return;
             }
-            if (File.ReadAllText(path) == string.Empty)
-                File.WriteAllText(path,content);
+            if (Filemanager.ReadFile(path) == string.Empty)
+                Filemanager.WriteFile(path,content);
         }
 
 

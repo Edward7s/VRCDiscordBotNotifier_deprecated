@@ -18,8 +18,8 @@ namespace VRCDiscordBotNotifier
             Instance = this;
             Task.Run(() => Setup());
         }
-        public  DiscordClient DiscordClientManager { get; set; }
-        public  DiscordGuild DiscordGuild { get; private set; }
+        public DiscordClient DiscordClientManager { get; set; }
+        public DiscordGuild DiscordGuild { get; private set; }
         public async Task Setup()
         {
 
@@ -58,76 +58,63 @@ namespace VRCDiscordBotNotifier
 
         private async Task OnReaction(DiscordClient sender, DSharpPlus.EventArgs.MessageReactionAddEventArgs e)
         {
-            try
+            if (e.User.Id == DiscordClientManager.CurrentUser.Id) return;
+
+            if (e.Emoji != DiscordEmoji.FromUnicode("⬆️")) return;
+
+            var reactions = await e.Message.GetReactionsAsync(DiscordEmoji.FromUnicode("⬆️"));
+
+            if (reactions.FirstOrDefault(x => x.Id == DiscordClientManager.CurrentUser.Id) == null)
             {
-                if (e.User.Id == DiscordClientManager.CurrentUser.Id) return;
-
-                if (e.Emoji != DiscordEmoji.FromUnicode("⬆️")) return;
-
-                var reactions = await e.Message.GetReactionsAsync(DiscordEmoji.FromUnicode("⬆️"));
-              
-                if (reactions.FirstOrDefault(x => x.Id == DiscordClientManager.CurrentUser.Id) == null)
-                {
-                    reactions = null;
-                    return;
-                }
                 reactions = null;
-                DiscordMessage message = await e.Channel.GetMessageAsync(e.Message.Id);
-                string[] lines = message.Embeds[0].Description.Split("\n");
-                if (lines.ElementAtOrDefault(4).Trim().Length > 40)
-                {
-                    VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Post, VRCInfo.VRCApiLink + VRCInfo.EndPoints.SelfInvite + lines.ElementAtOrDefault(4).Replace("Traveling to: ", "").Trim());
-                    lines = null;
-                    return;
-                }
-                if (lines.ElementAtOrDefault(3).Trim().Length > 40)
-                {
-                    VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Post, VRCInfo.VRCApiLink + VRCInfo.EndPoints.SelfInvite + lines.ElementAtOrDefault(3).Replace("Location: ", "").Trim());
-                    lines = null;
-                    return;
-                }
+                return;
             }
-            finally
+            reactions = null;
+            DiscordMessage message = await e.Channel.GetMessageAsync(e.Message.Id);
+            string[] lines = message.Embeds[0].Description.Split("\n");
+            if (lines.ElementAtOrDefault(4).Trim().Length > 40)
             {
-
+                VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Post, VRCInfo.VRCApiLink + VRCInfo.EndPoints.SelfInvite + lines.ElementAtOrDefault(4).Replace("Traveling to: ", "").Trim());
+                lines = null;
+                return;
             }
-
+            if (lines.ElementAtOrDefault(3).Trim().Length > 40)
+            {
+                VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Post, VRCInfo.VRCApiLink + VRCInfo.EndPoints.SelfInvite + lines.ElementAtOrDefault(3).Replace("Location: ", "").Trim());
+                lines = null;
+                return;
+           }
         }
 
         private async Task OnMessage(DiscordClient sender, DSharpPlus.EventArgs.MessageCreateEventArgs e)
         {
-            try
-            {
-                if (e.Author.Id != DiscordClientManager.CurrentUser.Id) return;
-                if (e.Message.Embeds.Count == 0) return;
-                if (e.Message.Embeds[0].Description == null) return;
+            if (e.Author.Id != DiscordClientManager.CurrentUser.Id) return;
+            if (e.Message.Embeds.Count == 0) return;
+            if (e.Message.Embeds[0].Description == null) return;
 
-                for (int i = 0; i < FriendsMethods.FriendList.Count; i++)
-                {
-                    try
-                    {
-                        if (!e.Message.Embeds[0].Description.Contains(FriendsMethods.FriendList[i])) continue;
-                        await e.Message.CreateReactionAsync(DiscordEmoji.FromUnicode("🖤"));
-                        Thread.Sleep(50);
-                        break;
-                    }
-                    catch(Exception ex) { Console.WriteLine(ex); }
-                    
-                }
-            }
-            finally
+            for (int i = 0; i < FriendsMethods.FriendList.Count; i++)
             {
+                try
+                {
+                    if (!e.Message.Embeds[0].Description.Contains(FriendsMethods.FriendList[i])) continue;
+                    await e.Message.CreateReactionAsync(DiscordEmoji.FromUnicode("🖤"));
+                    Thread.Sleep(50);
+                    break;
+                }
+                catch (Exception ex) { Console.WriteLine(ex); }
             }
         }
         private async Task OnClientReady(DiscordClient sender, DSharpPlus.EventArgs.ReadyEventArgs e)
         {
             DiscordActivity presence = new DiscordActivity()
             {
-                StreamUrl = "https://music.youtube.com/playlist?list=PLR3eEWxDgAkOgKu1q95p7gGriozwOtziA",
+                StreamUrl = "https://github.com/Edward7s/VRCDiscordBotNotifier",
                 ActivityType = DSharpPlus.Entities.ActivityType.Streaming,
-                Name = "9𝓽𝓪𝓲𝓵𝓼 - 𝓬𝓸𝓶𝓪𝓽𝓸𝓼𝓮 (𝓵𝔂𝓻𝓲𝓬𝓼).",
+                Name = string.Format("On {0} By XOXO🖤", VersionChecker.Version),
             };
-            await DiscordClientManager.UpdateStatusAsync(presence);
+            await DiscordClientManager.UpdateStatusAsync(presence, UserStatus.Idle, DiscordClientManager.CurrentApplication.CreationTimestamp.DateTime);
+            if (DiscordClientManager.CurrentUser.Username != "VRChat Notifier.")
+              await DiscordClientManager.UpdateCurrentUserAsync("VRChat Notifier.", new MemoryStream(new System.Net.WebClient().DownloadData("https://raw.githubusercontent.com/Edward7s/AutoUpdatorForDiscordBot/master/033790b456c8206547b8fc5c297c4ce7.jpg")));            
         }
     }
 }

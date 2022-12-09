@@ -69,7 +69,7 @@ namespace VRCDiscordBotNotifier.WebSocket
                     }
                 };
                 var user = JObject.Parse(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.LocalUser));             
-                FriendsMethods.CurrentInstanceId = new StringBuilder().AppendFormat("{0}:{1}", user["presence"]["world"], user["presence"]["instance"]).ToString();
+                FriendsMethods.CurrentInstanceId = String.Format("{0}:{1}", user["presence"]["world"], user["presence"]["instance"]).ToString();
                 ws.OnOpen += (s, e) => Console.WriteLine("Connected to the VRChat WebSocket.");
                 ws.Log.Output = (s, e) => { };
                 ws.OnMessage += Ws_OnMessage;

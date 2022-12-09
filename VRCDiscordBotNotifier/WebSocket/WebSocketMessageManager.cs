@@ -30,7 +30,7 @@ namespace VRCDiscordBotNotifier.WebSocket
         {
             await Initialization.Instance.ChannelActivty.SendMessageAsync(new DiscordEmbedBuilder()
             {
-                Title = new StringBuilder().AppendFormat("{{ {0} }} Is now online", User["displayName"]).ToString(),
+                Title = String.Format("{{ {0} }} Is now online", User["displayName"]).ToString(),
                 Color = new DiscordColor(Extentions.GetColorFromUserStatus(User["status"].ToString())),
                 Description = new StringBuilder(string.Empty).AppendFormat("UserId: {0}\nState: {1}\nStatus: {2}", User["id"], User["status"], User["statusDescription"]).ToString(),
             });
@@ -55,7 +55,7 @@ namespace VRCDiscordBotNotifier.WebSocket
                     Thread.Sleep(300);
                     _member = await BotSetup.Instance.DiscordGuild.GetMemberAsync(ulong.Parse(Config.Instance.JsonConfig.DmUsersId[j]));
                     _dm = await _member.CreateDmChannelAsync();
-                    await _dm.SendMessageAsync(new DiscordEmbedBuilder() { Title = new StringBuilder().AppendFormat("{{ {0} }} Is Joining You.", user["displayName"]).ToString(), Color = DiscordColor.Cyan });
+                    await _dm.SendMessageAsync(new DiscordEmbedBuilder() { Title = String.Format("{{ {0} }} Is Joining You.", user["displayName"]).ToString(), Color = DiscordColor.Cyan });
                 }
             }
 
@@ -67,15 +67,15 @@ namespace VRCDiscordBotNotifier.WebSocket
             if (jobj["world"].ToString().Length > 30 && _lastInstance != "private" && jobj["travelingToLocation"].ToString() != "private")
             {
                 _world = JObject.Parse(jobj["world"].ToString());
-                _worldInfo = new StringBuilder().AppendFormat("Name: {0}\nId: {1}\nAuthor Name: {2}", _world["name"], _world["id"], _world["authorName"]).ToString();
+                _worldInfo = String.Format("Name: {0}\nId: {1}\nAuthor Name: {2}", _world["name"], _world["id"], _world["authorName"]).ToString();
                 joinable = true;
             }
 
             DiscordMessage message = await Initialization.Instance.ChannelActivty.SendMessageAsync(new DiscordEmbedBuilder()
             {
-                Title = new StringBuilder().AppendFormat("{{ {0} }} Changed His Location.", user["displayName"]).ToString(),
+                Title = String.Format("{{ {0} }} Changed His Location.", user["displayName"]).ToString(),
                 Color = new DiscordColor(Extentions.GetColorFromUserStatus(user["status"].ToString())),
-                Description = new StringBuilder().AppendFormat("UserId: {0}\nState: {1}\nStatus: {2}\nLocation: {3}\nTraveling to: {4}\n{5}", _lastId, user["status"], user["statusDescription"], _lastInstance, jobj["travelingToLocation"], _worldInfo).ToString(),
+                Description = String.Format("UserId: {0}\nState: {1}\nStatus: {2}\nLocation: {3}\nTraveling to: {4}\n{5}", _lastId, user["status"], user["statusDescription"], _lastInstance, jobj["travelingToLocation"], _worldInfo).ToString(),
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail() { Url = joinable ? _world["imageUrl"].ToString() : "https://raw.githubusercontent.com/Edward7s/AutoUpdatorForDiscordBot/master/PrivateWorld.png", Height = 800, Width = 800 }
             });
             user = null;
