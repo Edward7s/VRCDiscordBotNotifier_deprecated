@@ -29,7 +29,7 @@
 ![image](https://user-images.githubusercontent.com/74219635/199615957-61ef085e-ec01-4605-9d0c-a9a9621ecdb5.png)
 ![image](https://user-images.githubusercontent.com/74219635/199628748-218ef28e-e19c-41f8-bf2b-a0bb5b27f006.png)
 
-![image](https://user-images.githubusercontent.com/74219635/204139502-4f138f46-8fb4-4bf8-94e5-0bee5ffb8576.png)
+![image](https://user-images.githubusercontent.com/74219635/206785981-675c5d06-1484-4a2e-ab00-6d4476793a85.png)
 
 
 #### Used: Dsharp+, newtonsoft.json, websocket-sharp and discord-rpc-csharp.
