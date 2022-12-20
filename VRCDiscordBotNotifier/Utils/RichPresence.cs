@@ -73,6 +73,7 @@ namespace VRCDiscordBotNotifier.Utils
                     _richPresence.State = String.Format("On: {1}, Friends: {2}/{3}, 👤: {0}", _localUser["displayName"], Extentions.PlatformType((string)_localUser["presence"]["platform"]), _localUser["onlineFriends"].ToArray().Length, _localUser["friends"].ToArray().Length).ToString();
                     if (_lastWorld != _localUser["presence"]["world"].ToString())
                     {
+                        _lastWorld = _localUser["presence"]["world"].ToString();
                         _assets.LargeImageText = string.Format("Offline 🛏 , Last LogIn: {0}", DateTime.Parse(_localUser["last_login"].ToString()).ToLocalTime());
                         _assets.LargeImageKey = "https://raw.githubusercontent.com/Edward7s/AutoUpdatorForDiscordBot/master/dribbble.gif";
                         if (_localUser["presence"]["world"].ToString() == "traveling")
@@ -84,11 +85,10 @@ namespace VRCDiscordBotNotifier.Utils
                         else if (_localUser["presence"]["world"].ToString() != "offline")
                         {
                             _time = DateTime.Now;
-                            _lastWorld = _localUser["presence"]["world"].ToString();
                             Thread.Sleep(300);
                             _worldInfo = JObject.Parse(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.Worlds + _localUser["presence"]["world"]));
                             _worldStringInfo = String.Format("🏠In: {0} ", Extentions.InstanceType((string)_localUser["presence"]["instanceType"]));
-                            _toBe = string.Format("{0} |Cap: {1} |👥: {2} |🖤: {3} |🔥: {5} |By: {6}", _worldInfo["name"], _worldInfo["capacity"], _worldInfo["occupants"], _worldInfo["favorites"], _worldInfo["heat"], _worldInfo["authorName"]).ToString();
+                            _toBe = string.Format("{0} |Cap: {1} |👥: {2} |🖤: {3} |🔥: {4} |By: {5}", _worldInfo["name"], _worldInfo["capacity"], _worldInfo["occupants"], _worldInfo["favorites"], _worldInfo["heat"], _worldInfo["authorName"]).ToString();
                             _assets.LargeImageText = _toBe.Length > 127 ? "The World Info Is To Big To Use Load..." : _toBe;
                             _assets.LargeImageKey = _worldInfo["imageUrl"].ToString();
                         }
@@ -96,7 +96,7 @@ namespace VRCDiscordBotNotifier.Utils
                             _worldStringInfo = string.Empty;
 
 
-                        if (_worldStringInfo != string.Empty && _worldStringInfo != "Joining A World, ")
+                        if (_worldStringInfo != string.Empty && _worldStringInfo != "Joining A World🚆, ")
                             _richPresence.Details = string.Format("{0}🕒For: {1}, State: {2}", _worldStringInfo, ((TimeSpan)(DateTime.Now - _time)).ToString(@"hh\:mm\:ss"), _localUser["status"]).ToString();
                         else
                             _richPresence.Details = String.Format("{0}State: {1}", _worldStringInfo, _localUser["status"]).ToString();

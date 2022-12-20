@@ -37,7 +37,7 @@ namespace VRCDiscordBotNotifier.Utils
                         Thread.Sleep(200);
                         s_member = await BotSetup.Instance.DiscordGuild.GetMemberAsync(ulong.Parse(Config.Instance.JsonConfig.DmUsersId[j]));
                         s_dm = await s_member.CreateDmChannelAsync();
-                        await s_dm.SendMessageAsync(new DiscordEmbedBuilder() { Title = String.Format("{{ {0} }} Sent you a {1}", s_apiNotificationsArr[i].senderUsername, s_apiNotificationsArr[i].type).ToString(),Description = String.Format("Created at: {0}\n{1}", DateTime.Parse(s_apiNotificationsArr[i].created_at).ToLocalTime(), s_apiNotificationsArr[i].details == string.Empty ? string.Empty : s_apiNotificationsArr[i].details).ToString(), Color = DiscordColor.Purple });
+                        await s_dm.SendMessageAsync(new DiscordEmbedBuilder() { Title = String.Format("{{ {0} }} Sent you a {1}", s_apiNotificationsArr[i].senderUsername, s_apiNotificationsArr[i].type).ToString(),Description = String.Format("Created at: {0}\n{1}", DateTime.Parse(s_apiNotificationsArr[i].created_at).ToLocalTime(), s_apiNotificationsArr[i].details.Length < 6 ? string.Empty :Extentions.GetDetailsInfo(s_apiNotificationsArr[i].details)).ToString(), Color = DiscordColor.Purple });
                     }
                 }
                 Filemanager.WriteFile(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Config.Instance.Notifications, s_apiNotifications);

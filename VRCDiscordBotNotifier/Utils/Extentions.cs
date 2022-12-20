@@ -31,6 +31,16 @@ namespace VRCDiscordBotNotifier.Utils
                 Filemanager.WriteFile(path,content);
         }
 
+        public static string GetDetailsInfo(string info)
+        {
+            JObject jobj = JObject.Parse(info);
+            if (jobj["worldId"] != null)
+                return string.Format("World Name: {0}\nId: {1}", jobj["worldName"], jobj["worldId"]);
+            
+
+            return string.Empty;
+        }
+
 
         public static string InstanceType(string type)
         {
