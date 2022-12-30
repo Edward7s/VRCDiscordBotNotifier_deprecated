@@ -26,13 +26,13 @@ namespace VRCDiscordBotNotifier
 
         public void SaveConfig() =>
             Filemanager.WriteFile(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + _fileName, JsonConvert.SerializeObject(JsonConfig));
-       
+
         public List<Json.User> UsersArr { get; } = new List<Json.User>();
         private PropertyInfo[] _props { get; set; }
-        public Config()
+        public bool Initialize()
         {
             Instance = this;
-
+            Console.ForegroundColor = ConsoleColor.Green;
             Extentions.CheckFileSanity(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + _fileName,
                 JsonConvert.SerializeObject(new Json.Config()
                 {
@@ -57,7 +57,28 @@ namespace VRCDiscordBotNotifier
                 break;
             }
             Thread.Sleep(100);
+
+
+            Console.WriteLine("Creating Cookies For Requests...");
             new VRCWebRequest();
+
+            Console.WriteLine("Checking User Info...");
+            CheckVRCUser();
+
+            Console.WriteLine("Checking File Integrity...");
+            for (int i = 0; i < _props.Length; i++)
+            {
+                if (_props[i].GetValue(JsonConfig) != null) continue;
+
+                if (_props[i].GetType() == typeof(bool))
+                {
+                    _props[i].SetValue(JsonConfig, false);
+                    continue;
+                }
+                _props[i].SetValue(JsonConfig, string.Empty);
+            }
+
+            Console.WriteLine("Checking Friends File...");
             if (!File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + FriendsFile) || Filemanager.ReadFile(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + FriendsFile) == string.Empty)
             {
                 string FriendsList = string.Empty;
@@ -68,30 +89,22 @@ namespace VRCDiscordBotNotifier
                 jobject = null;
                 FriendsList = null;
             }
-            Extentions.CheckFileSanity(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Notifications,VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.Notifications));
+            Console.WriteLine("Checking Registry Key...");
+
             RegistryKey startup = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
             if (startup.GetValue("VRCDiscordBotNotifier") == null)
+            {
                 startup.SetValue("VRCDiscordBotNotifier", Directory.GetCurrentDirectory() + "\\VRCDiscordBotNotifier.exe");
 
-
-            //Checking Integrity
-            for (int i = 0; i < _props.Length; i++)
-            {
-                if (_props[i].GetValue(JsonConfig) != null) continue;
-               
-                if (_props[i].GetType() == typeof(bool))
-                {
-                    _props[i].SetValue(JsonConfig, false);
-                    continue;
-                }
-                _props[i].SetValue(JsonConfig, string.Empty);
             }
 
-
+            Console.WriteLine("Checking Notifications File...");
+            Extentions.CheckFileSanity(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Notifications, VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.Notifications));
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            return true;
         }
         private void Register()
         {
-            
             Console.Clear();
             JsonConfig = JsonConvert.DeserializeObject<Json.Config>(Filemanager.ReadFile(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + _fileName));
             Console.ForegroundColor = ConsoleColor.Yellow;
@@ -107,11 +120,10 @@ namespace VRCDiscordBotNotifier
 
         private void CheckVRCUser()
         {
-            Console.Clear();
             string code = VRCWebRequest.TestReqest(JsonConfig.AuthCookie);
-            Console.WriteLine(code);
             if (code == "401" || code == "404")
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("+ - + - + - + - + - + - + - + - + - + - + - + - + - + - + - + - + - + - + - + - +");
                 Console.WriteLine("+  Your VRC Information its not right make sure you enter the right infomation. +");
                 Console.WriteLine("+ - + - + - + - + - + - + - + - + - + - + - + - + - + - + - + - + - + - + - + - +");
@@ -119,6 +131,7 @@ namespace VRCDiscordBotNotifier
                 Console.WriteLine("Please Enter Your VRChat AuthCookie.");
                 JsonConfig.AuthCookie = Console.ReadLine().Trim();
                 Filemanager.WriteFile(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + _fileName, JsonConvert.SerializeObject(JsonConfig));
+                new VRCWebRequest();
                 CheckVRCUser();
                 return;
             }

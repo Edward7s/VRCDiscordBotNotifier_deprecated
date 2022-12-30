@@ -31,6 +31,7 @@ namespace VRCDiscordBotNotifier.Utils
 
         public RichPresence()
         {
+            Console.WriteLine("Seting Up Rich Presence...");
             _client = new DiscordRpcClient(Config.Instance.JsonConfig.AplicationId, -1, null, false);
             _client.Logger = new ConsoleLogger() { Level = LogLevel.Warning };
             _client.Initialize();

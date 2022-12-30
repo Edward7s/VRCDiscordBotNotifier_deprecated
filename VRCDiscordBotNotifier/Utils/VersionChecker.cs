@@ -10,9 +10,10 @@ namespace VRCDiscordBotNotifier.Utils
 {
     internal class VersionChecker
     {
-        public static string Version { get; } = "V2.0";
+        public static string Version { get; } = "V2.1";
         public VersionChecker()
         {
+            Console.WriteLine("Checking For Any Updates...");
             if (!Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\UpdatorNocturnal"))
                 Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\UpdatorNocturnal");
 

@@ -22,18 +22,26 @@ namespace VRCDiscordBotNotifier.Utils
 
         public static string TestReqest(string authCookie)
         {
-            _testReq = (HttpWebRequest)WebRequest.Create(VRCInfo.VRCApiLink + VRCInfo.EndPoints.LocalUser);
-            _testReq.CookieContainer = new CookieContainer();
-            _testReq.CookieContainer.Add(new Cookie() { Name = "apiKey", Value = "JlE5Jldo5Jibnk5O5hTx6XVqsJu4WJ26", Domain = "vrchat.com" });
-            _testReq.CookieContainer.Add(new Cookie() { Name = "auth", Value = authCookie, Domain = "vrchat.com" });
-            _testReq.Method = "Get";
-            _testReq.UserAgent = "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Mobile Safari/537.36";
-            _testReq.ContentType = "application/json";
-            _testReq.Accept = "application/json, text/plain, */*";
-            _testReq.SendChunked = true;
-            _testReq.ContentLength = 0;
-            _testResponse = (HttpWebResponse)_testReq.GetResponse();
-            return _testResponse.StatusCode.ToString();
+            try
+            {
+                _testReq = (HttpWebRequest)WebRequest.Create(VRCInfo.VRCApiLink + VRCInfo.EndPoints.LocalUser);
+                _testReq.CookieContainer = new CookieContainer();
+                _testReq.CookieContainer.Add(new Cookie() { Name = "apiKey", Value = "JlE5Jldo5Jibnk5O5hTx6XVqsJu4WJ26", Domain = "vrchat.com" });
+                _testReq.CookieContainer.Add(new Cookie() { Name = "auth", Value = authCookie, Domain = "vrchat.com" });
+                _testReq.Method = "Get";
+                _testReq.UserAgent = "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Mobile Safari/537.36";
+                _testReq.ContentType = "application/json";
+                _testReq.Accept = "application/json, text/plain, */*";
+                _testReq.SendChunked = true;
+                _testReq.ContentLength = 0;
+                _testResponse = (HttpWebResponse)_testReq.GetResponse();
+                return _testResponse.StatusCode.ToString();
+            }
+            catch
+            {
+                return "401";
+            }
+            
         }
         public enum RequestType
         {

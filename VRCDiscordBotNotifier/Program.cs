@@ -41,7 +41,11 @@ namespace VRCDiscordBotNotifier
             });
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("Initializing Config, This might take a bit depending on your enthernet speed and how much vrc friends you have.");
-            new Config();
+            bool config = new Config().Initialize();
+            while (config != true)
+            {
+                return;
+            }
             Console.WriteLine("Initializing Bot");
             new BotSetup();
             Console.ReadLine();
