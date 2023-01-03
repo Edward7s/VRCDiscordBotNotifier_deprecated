@@ -1,10 +1,12 @@
-﻿using DSharpPlus.Entities;
+﻿using DSharpPlus;
+using DSharpPlus.Entities;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using VRCDiscordBotNotifier.Utils;
 using static VRCDiscordBotNotifier.Utils.Json;
@@ -22,9 +24,20 @@ namespace VRCDiscordBotNotifier.WebSocket
 
         private string _worldInfo { get; set; }
 
-        public async Task Offline(string id) =>
-            await Initialization.Instance.ChannelActivty.SendMessageAsync(new DiscordEmbedBuilder() { Title = "{ " + JObject.FromObject(JObject.Parse(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.UserEndPoint + id)))["displayName"].ToString() + " } Is now offline.", Description = "UserId: " + id, Color = DiscordColor.Gray });
+        private DSharpPlus.Entities.DiscordChannel _channel { get; set; }
+        
+        public async Task Offline(string id)
+        {
+            if (FriendsMethods.FriendList.Contains(id))
+            {
+                var channels = await BotSetup.Instance.DiscordGuild.GetChannelsAsync();
+                _channel = channels.FirstOrDefault(x => x.Topic == id);
+                if (_channel != null)
+                    await _channel.DeleteAsync();               
+            }
 
+            await Initialization.Instance.ChannelActivty.SendMessageAsync(new DiscordEmbedBuilder() { Title = "{ " + JObject.FromObject(JObject.Parse(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.UserEndPoint + id)))["displayName"].ToString() + " } Is now offline.", Description = "UserId: " + id, Color = DiscordColor.Gray });
+        }
 
         public async Task Online(JObject User)
         {

@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using VRCDiscordBotNotifier.Utils;
+﻿using VRCDiscordBotNotifier.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Text.Json.Nodes;
 using DSharpPlus.Entities;
 
 namespace VRCDiscordBotNotifier
@@ -29,14 +23,14 @@ namespace VRCDiscordBotNotifier
                    break;
                }
            });
-        private DSharpPlus.Entities.DiscordChannel Category { get; set; }
+        private DSharpPlus.Entities.DiscordChannel _category { get; set; }
         private async Task Initialize()
         {
             ConsoleManager.Write("Looking For Favorite Category...");
             var channels = await BotSetup.Instance.DiscordGuild.GetChannelsAsync();
 
-            Category = channels.FirstOrDefault(x => x.Name == "online-favorites" && x.Type == DSharpPlus.ChannelType.Category);
-            if (Category != null)
+            _category = channels.FirstOrDefault(x => x.Name == "online-favorites" && x.Type == DSharpPlus.ChannelType.Category);
+            if (_category != null)
             {
                 ConsoleManager.Write("Found Favorite Category.");
                 ConsoleManager.Write("Clearing Old Channels...");
@@ -44,14 +38,14 @@ namespace VRCDiscordBotNotifier
                 {
 
                     if (channels[i].Parent == null) continue;
-                    if (channels[i].Parent.Id != Category.Id) continue;
+                    if (channels[i].Parent.Id != _category.Id) continue;
                     await channels[i].DeleteAsync();
                 }
                 SetupChannels();
                 return;
             }
             ConsoleManager.Write("Creating New Category...");
-            Category = await BotSetup.Instance.DiscordGuild.CreateChannelCategoryAsync("online-favorites");
+            _category = await BotSetup.Instance.DiscordGuild.CreateChannelCategoryAsync("online-favorites");
             SetupChannels();
         }
 
@@ -64,7 +58,7 @@ namespace VRCDiscordBotNotifier
                 if (onlineFavoriteFriends[i].location == "offline") continue;
                 if (onlineFavoriteFriends[i].location == "private") continue;
                 if (onlineFavoriteFriends[i].location == "traveling") continue;
-                await BotSetup.Instance.DiscordGuild.CreateChannelAsync(onlineFavoriteFriends[i].displayName, DSharpPlus.ChannelType.Text, Category, onlineFavoriteFriends[i].id);
+                await BotSetup.Instance.DiscordGuild.CreateChannelAsync(onlineFavoriteFriends[i].displayName, DSharpPlus.ChannelType.Text, _category, onlineFavoriteFriends[i].id);
                 await UpdateOrSendMessage(onlineFavoriteFriends[i].id, onlineFavoriteFriends[i].location);
             }
             ConsoleManager.Write("Finished New Channels...");
@@ -83,7 +77,7 @@ namespace VRCDiscordBotNotifier
             _worldInfo = JObject.Parse(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.Worlds + instanceid.Split(":")[0]));
             _worldInstance = JObject.Parse(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.Instance + instanceid));
             if (channel == null)
-                channel = await BotSetup.Instance.DiscordGuild.CreateChannelAsync(_user["displayName"].ToString(), DSharpPlus.ChannelType.Text, Category, id);
+                channel = await BotSetup.Instance.DiscordGuild.CreateChannelAsync(_user["displayName"].ToString(), DSharpPlus.ChannelType.Text, _category, id);
             var pins = await channel.GetPinnedMessagesAsync();
             if (pins.Count != 0)
             {
