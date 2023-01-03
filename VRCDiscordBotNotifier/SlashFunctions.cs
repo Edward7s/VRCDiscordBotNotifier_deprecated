@@ -65,8 +65,6 @@ namespace VRCDiscordBotNotifier
             await context.CreateResponseAsync($"You turned Friend Join Dm: {Toggle(Config.Instance.JsonConfig.DmOnFriendJoin)}");
         }
 
-
-
         [SlashCommand("DmFriendAddOrRemove", "Dms you if someone added you or removed you")]
         public async Task FriendM(InteractionContext context)
         {
@@ -95,6 +93,14 @@ namespace VRCDiscordBotNotifier
             await context.CreateResponseAsync($"You turned Online Users Messages: {Toggle(Config.Instance.JsonConfig.FriendsActivity)}");
         }
 
+        [SlashCommand("DmFavoriteFriendOnline", "Dms you wen one of your favorite friends is online.")]
+        public async Task FavoriteFriendOnline(InteractionContext context)
+        {
+            Config.Instance.JsonConfig.DmFavoriteFriendOnlline = !Config.Instance.JsonConfig.DmFavoriteFriendOnlline;
+            Config.Instance.SaveConfig();
+            await context.CreateResponseAsync($"You turned Favorite Friend Online Dm: {Toggle(Config.Instance.JsonConfig.DmFavoriteFriendOnlline)}");
+        }
+
         [SlashCommand("ApplicationId", "Set's The Application Id for the Rich Presence")]
         public async Task AppId(InteractionContext context, [Option("AplicationId", "Your ApplicationId")] string str)
         {
@@ -102,8 +108,6 @@ namespace VRCDiscordBotNotifier
             Config.Instance.SaveConfig();
             await context.CreateResponseAsync($"The AplicationId is {str}");
         }
-
-
 
         [SlashCommand("RichPresence", "Toggles the Rich Presnece")]
         public async Task RichPresence(InteractionContext context)
@@ -118,10 +122,8 @@ namespace VRCDiscordBotNotifier
             if (Config.Instance.JsonConfig.RichPresence)
                 Task.Run(() => new RichPresence());
 
-
             await context.CreateResponseAsync($"You turned The RichPresence: {Toggle(Config.Instance.JsonConfig.RichPresence)}");
         }
-
 
         [SlashCommand("FriendRequests", "Checks All Your Friend Requests")]
         public async Task FriendRequests(InteractionContext context)
@@ -148,26 +150,5 @@ namespace VRCDiscordBotNotifier
             VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Put, VRCInfo.VRCApiLink + VRCInfo.EndPoints.AcceptFriendReq(friends[number].id));
             await context.CreateResponseAsync(new DiscordEmbedBuilder() { Title = String.Format("Accepted [{0}] Friends Request", friends[number].senderUsername), Color = DiscordColor.Green });
         }
-
-
-
-        /*  [SlashCommand("MessageStatus", "Messages you on a channel if someone changed they're status")]
-          public async Task MessageStatus(InteractionContext context)
-          {
-              Config.Instance.JsonConfig.MessageStatusChange = !Config.Instance.JsonConfig.MessageStatusChange;
-              if (Config.Instance.JsonConfig.MessageStatusChange)
-                  Initialization.Instance.ChannelStatus = await Extentions.GetOrCreateChannel("n_status");
-              else
-              {
-                  var channels = await context.Guild.GetChannelsAsync();
-                  if (channels.FirstOrDefault(x => x.Name != "n_status") != null)
-                      await channels.First(x => x.Name == "n_status").DeleteAsync();
-                  channels = null;
-              }
-              Config.Instance.SaveConfig();
-
-              await context.CreateResponseAsync($"You turned status Users Messages: {Toggle(Config.Instance.JsonConfig.MessageStatusChange)}");
-          }
-        */
     }
 }

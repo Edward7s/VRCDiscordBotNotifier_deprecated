@@ -22,8 +22,8 @@ namespace VRCDiscordBotNotifier.Utils
             public bool FirstTime { get; set; }
             public bool DmOnFriendJoin { get; set; }
             public bool RichPresence { get; set; }
-
             public string AplicationId { get; set; }
+            public bool DmFavoriteFriendOnlline { get; set; }
 
         }
 
@@ -34,6 +34,13 @@ namespace VRCDiscordBotNotifier.Utils
             public string Status { get; set; }
             public string State { get; set; }
 
+        }
+
+        public class Friend
+        {
+            public string displayName { get; set; }
+            public string id { get; set; }
+            public string location { get; set; }
         }
 
         public class WebSocket

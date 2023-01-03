@@ -34,6 +34,22 @@ namespace VRCDiscordBotNotifier.WebSocket
                 Color = new DiscordColor(Extentions.GetColorFromUserStatus(User["status"].ToString())),
                 Description = new StringBuilder(string.Empty).AppendFormat("UserId: {0}\nState: {1}\nStatus: {2}", User["id"], User["status"], User["statusDescription"]).ToString(),
             });
+            if (!Config.Instance.JsonConfig.DmFavoriteFriendOnlline) return;
+            if (!FriendsMethods.FriendList.Contains(User["id"].ToString())) return;
+
+            for (int j = 0; j < Config.Instance.JsonConfig.DmUsersId.Length; j++)
+            {
+                Thread.Sleep(300);
+                _member = await BotSetup.Instance.DiscordGuild.GetMemberAsync(ulong.Parse(Config.Instance.JsonConfig.DmUsersId[j]));
+                _dm = await _member.CreateDmChannelAsync();
+                await _dm.SendMessageAsync(new DiscordEmbedBuilder()
+                {
+                    Title = String.Format("{{ {0} }} Is now online", User["displayName"]).ToString(),
+                    Color = new DiscordColor(Extentions.GetColorFromUserStatus(User["status"].ToString())),
+                    Description = new StringBuilder(string.Empty).AppendFormat("State: {0}\nStatus: {1}", User["status"], User["statusDescription"]).ToString(),
+                });
+            }
+
         }
 
         public async Task Location(JObject jobj)
@@ -47,6 +63,7 @@ namespace VRCDiscordBotNotifier.WebSocket
             }
             _lastId = user["id"].ToString();
             _lastInstance = jobj["location"].ToString();
+
 
             if (Config.Instance.JsonConfig.DmOnFriendJoin && FriendsMethods.CurrentInstanceId != "offline:offline" && jobj["travelingToLocation"].ToString() == FriendsMethods.CurrentInstanceId)
             {
@@ -69,7 +86,12 @@ namespace VRCDiscordBotNotifier.WebSocket
                 _world = JObject.Parse(jobj["world"].ToString());
                 _worldInfo = String.Format("Name: {0}\nId: {1}\nAuthor Name: {2}", _world["name"], _world["id"], _world["authorName"]).ToString();
                 joinable = true;
+
+                if (FriendsMethods.FriendList.Contains(user["id"].ToString()))
+                  Task.Run(() => Favorites.Instance.UpdateOrSendMessage(user["id"].ToString(), _lastInstance));
             }
+
+
 
             DiscordMessage message = await Initialization.Instance.ChannelActivty.SendMessageAsync(new DiscordEmbedBuilder()
             {

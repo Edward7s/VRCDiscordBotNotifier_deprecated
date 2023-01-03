@@ -13,23 +13,13 @@ namespace VRCDiscordBotNotifier
   
         static void Main(string[] args)
         {
-            /*   AppDomain.CurrentDomain.FirstChanceException += (s, e) =>
-               {
-                   Console.WriteLine("---------------------Exception---------------------");
-                   Console.WriteLine(e.Exception.ToString());
-                   Console.WriteLine("---------------------------------------------------");
-               };*/
+            Console.Title = "[VRCDiscordBot] By XOXO <3";
+            ConsoleManager.Write("Initializng Program...");
             new VersionChecker();
             AppDomain.CurrentDomain.UnhandledException += (s, e) =>
-            {
-                Console.WriteLine("-----------------UnhandledException-----------------");
-                Console.WriteLine(e.ToString());
-                Console.WriteLine("----------------------------------------------------");
-            }; 
+                 ConsoleManager.Write(e.ToString(), ConsoleColor.Red);
 
-
-            // Task.Run(() => new Utils.FilesWatcher());
-            Console.Title = "VRCDiscordBot";
+            ConsoleManager.Write("Running Force Memory Collection...");
             Task.Run(() =>
             {
                 while (true)
@@ -39,19 +29,16 @@ namespace VRCDiscordBotNotifier
                     Thread.Sleep(2000);
                 }            
             });
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("Initializing Config, This might take a bit depending on your enthernet speed and how much vrc friends you have.");
+             ConsoleManager.Write("Initializing Config...");
             bool config = new Config().Initialize();
             while (config != true)
             {
                 return;
             }
-            Console.WriteLine("Initializing Bot");
+             ConsoleManager.Write("Initializing Bot...");
             new BotSetup();
+            new Favorites();
             Console.ReadLine();
         }
-
-
-       
     }
 }

@@ -14,7 +14,7 @@ namespace VRCDiscordBotNotifier.Utils
         {
             public static string UserEndPoint { get; } = "users/"; /* Need UserId At The End */
             public static string LocalUser { get; } = "auth/user";
-            public static string FriendsOnline { get; } = "users/friends?offline=false&n=50&offset=0";
+            public static string FriendsOnline { get; } = "auth/user/friends?offline=false&n=100";
             public static string Worlds { get; } = "worlds/"; /* WorldId */
             public static string Instance { get; } = "instances/"; /* InstanceId */
             public static string Avatar { get; } = "avatars/"; /* AvatarId */

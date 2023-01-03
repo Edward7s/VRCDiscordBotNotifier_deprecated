@@ -92,7 +92,7 @@ namespace VRCDiscordBotNotifier.Utils
                     _httpWebRequest = null;
                     if (WebResponse != null)
                          WebResponse.Dispose();
-                    Console.WriteLine("ERROR ON REQ: {0}", url);
+                     ConsoleManager.Write(string.Format("ERROR ON REQ: {0}", url));
                 }
                 Thread.Sleep(600);
             }

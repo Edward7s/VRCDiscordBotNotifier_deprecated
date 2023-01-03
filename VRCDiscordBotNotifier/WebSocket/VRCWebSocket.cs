@@ -16,7 +16,7 @@ namespace VRCDiscordBotNotifier.WebSocket
         public VRCWebSocket()
         {
 
-            Console.WriteLine("Connecting To VRC ws....");
+            ConsoleManager.Write("Connecting To VRC ws...");
             using (var ws = new WebSocketSharp.WebSocket("wss://vrchat.com/?authToken=" + Config.Instance.JsonConfig.AuthCookie))
             {
                 ws.SslConfiguration.EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12;
@@ -34,7 +34,7 @@ namespace VRCDiscordBotNotifier.WebSocket
                             ws.Connect();
                         }
                         catch { }
-                        Console.WriteLine("!");
+                         ConsoleManager.Write("!");
 
                     }
                 }
@@ -42,7 +42,7 @@ namespace VRCDiscordBotNotifier.WebSocket
                 {
                     try
                     {
-                        Console.WriteLine("Re Connecting to VRC ws.");
+                         ConsoleManager.Write("Re Connecting to VRC ws.");
                         try
                         {
                             ws.Connect();
@@ -58,23 +58,23 @@ namespace VRCDiscordBotNotifier.WebSocket
                                     ws.Connect();
                                 }
                                 catch { }
-                                Console.WriteLine("!");
+                                 ConsoleManager.Write("!");
 
                             }
                         }
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine(ex);
+                         ConsoleManager.Write(ex);
                     }
                 };
                 var user = JObject.Parse(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.LocalUser));             
                 FriendsMethods.CurrentInstanceId = String.Format("{0}:{1}", user["presence"]["world"], user["presence"]["instance"]).ToString();
-                ws.OnOpen += (s, e) => Console.WriteLine("Connected to the VRChat WebSocket.");
+                ws.OnOpen += (s, e) =>  ConsoleManager.Write("Connected to the VRChat WebSocket.");
                 ws.Log.Output = (s, e) => { };
                 ws.OnMessage += Ws_OnMessage;
             }
-          
+            ConsoleManager.Write("Finished WebSocket.");
         }
         private WebSocketMessageManager _webSocketManager { get; } = new WebSocketMessageManager();
         private Json.WebSocket _wsJson { get; set; }

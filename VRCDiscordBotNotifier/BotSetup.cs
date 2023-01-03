@@ -30,29 +30,33 @@ namespace VRCDiscordBotNotifier
                     Token = Config.Instance.JsonConfig.BotToken,
                     TokenType = TokenType.Bot,
                     AutoReconnect = true,
-                });
+                    MinimumLogLevel = Microsoft.Extensions.Logging.LogLevel.Critical
+                }) ;
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Your bot Token Might Be Not Valid.");
-                Console.WriteLine(ex);
-                Console.WriteLine("Please go to =>");
-                Console.WriteLine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\VRCDiscordBotManager.json");
-                Console.WriteLine("And replace the BotToken");
+                 ConsoleManager.Write("Your bot Token Might Be Not Valid.");
+                 ConsoleManager.Write(ex);
+                 ConsoleManager.Write("Please go to =>");
+                 ConsoleManager.Write(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\VRCDiscordBotManager.json");
+                 ConsoleManager.Write("And replace the BotToken");
                 return;
             }
+            ConsoleManager.Write("Registering Bot Utils...");
             var slash = DiscordClientManager.UseSlashCommands();
             slash.RegisterCommands<SlashFunctions>(ulong.Parse(Config.Instance.JsonConfig.DiscordServerId));
             DiscordClientManager.Ready += OnClientReady;
             DiscordClientManager.MessageCreated += OnMessage;
             DiscordClientManager.MessageReactionAdded += OnReaction;
             await DiscordClientManager.ConnectAsync();
+            ConsoleManager.Write("Getting Guild...");
             DiscordGuild = await DiscordClientManager.GetGuildAsync(ulong.Parse(Config.Instance.JsonConfig.DiscordServerId));
             new Initialization();
             Task.Run(() => new NotificationsLoop().Loop());
             Task.Run(() => new WebSocket.VRCWebSocket());
             if (Config.Instance.JsonConfig.RichPresence)
                 Task.Run(() => new RichPresence());
+            ConsoleManager.Write("Bot Initialized.");
             await Task.Delay(-1);
         }
 
@@ -71,7 +75,18 @@ namespace VRCDiscordBotNotifier
             }
             reactions = null;
             DiscordMessage message = await e.Channel.GetMessageAsync(e.Message.Id);
+
+
             string[] lines = message.Embeds[0].Description.Split("\n");
+
+
+            if (message.Pinned)
+            {
+                VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Post, VRCInfo.VRCApiLink + VRCInfo.EndPoints.SelfInvite + lines[17].Replace("- Id ", "").Trim());
+                lines = null;
+                return;
+            }
+
             if (lines.ElementAtOrDefault(4).Trim().Length > 40)
             {
                 VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Post, VRCInfo.VRCApiLink + VRCInfo.EndPoints.SelfInvite + lines.ElementAtOrDefault(4).Replace("Traveling to: ", "").Trim());
@@ -101,11 +116,12 @@ namespace VRCDiscordBotNotifier
                     Thread.Sleep(50);
                     break;
                 }
-                catch (Exception ex) { Console.WriteLine(ex); }
+                catch (Exception ex) {  ConsoleManager.Write(ex); }
             }
         }
         private async Task OnClientReady(DiscordClient sender, DSharpPlus.EventArgs.ReadyEventArgs e)
         {
+            ConsoleManager.Write("Checking Client...");
             DiscordActivity presence = new DiscordActivity()
             {
                 StreamUrl = "https://github.com/Edward7s/VRCDiscordBotNotifier",
@@ -114,7 +130,7 @@ namespace VRCDiscordBotNotifier
             };
             await DiscordClientManager.UpdateStatusAsync(presence, UserStatus.Idle, DiscordClientManager.CurrentApplication.CreationTimestamp.DateTime);
             if (DiscordClientManager.CurrentUser.Username != "VRChat Notifier.")
-              await DiscordClientManager.UpdateCurrentUserAsync("VRChat Notifier.", new MemoryStream(new System.Net.WebClient().DownloadData("https://raw.githubusercontent.com/Edward7s/AutoUpdatorForDiscordBot/master/033790b456c8206547b8fc5c297c4ce7.jpg")));            
+              await DiscordClientManager.UpdateCurrentUserAsync("VRChat Notifier.", new MemoryStream(new System.Net.WebClient().DownloadData("https://raw.githubusercontent.com/Edward7s/AutoUpdatorForDiscordBot/master/033790b456c8206547b8fc5c297c4ce7.jpg")));
         }
     }
 }

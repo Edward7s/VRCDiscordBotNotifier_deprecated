@@ -27,11 +27,14 @@ namespace VRCDiscordBotNotifier.Utils
         private string _lastWorld { get; set; } = string.Empty;
         private Assets _assets { get; set; } = new Assets();
 
+        private string _lastAvatarId { get; set; } = string.Empty;
+        private JObject _avatarData { get; set; }
+
         private DiscordRPC.RichPresence _richPresence { get; } = new DiscordRPC.RichPresence();
 
         public RichPresence()
         {
-            Console.WriteLine("Seting Up Rich Presence...");
+             ConsoleManager.Write("Seting Up Rich Presence...");
             _client = new DiscordRpcClient(Config.Instance.JsonConfig.AplicationId, -1, null, false);
             _client.Logger = new ConsoleLogger() { Level = LogLevel.Warning };
             _client.Initialize();
@@ -39,6 +42,7 @@ namespace VRCDiscordBotNotifier.Utils
             _richPresence.Buttons = new Button[] { new Button() {Label = "User Profile.", Url = $"https://vrchat.com/home/user/{Config.Instance.JsonConfig.UserId}"} };
             _client.SetPresence(_richPresence);
             _richPresence.Timestamps = new Timestamps() { StartUnixMilliseconds = (ulong)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds };
+            ConsoleManager.Write("Starting Rich Presnece...");
             Task.Run(()=> Loop());
         }
 
@@ -66,7 +70,7 @@ namespace VRCDiscordBotNotifier.Utils
                     }
                     catch (JsonReaderException ex)
                     {
-                        Console.WriteLine(ex);
+                         ConsoleManager.Write(ex);
                         Thread.Sleep(6000);
                         continue;
                     }
@@ -108,14 +112,23 @@ namespace VRCDiscordBotNotifier.Utils
                     else
                         _worldStringInfo = string.Empty;
 
-                    _assets.SmallImageKey = _localUser["currentAvatarImageUrl"].ToString();
-                    _assets.SmallImageText = string.Format("🗒: {0}, {1}", _localUser["statusDescription"], _localUser["allowAvatarCopying"].ToString() == "True" ? "Cloning On." : "Cloning Off");
+
+
+                    if (_lastAvatarId != _localUser["currentAvatar"].ToString())
+                    {
+                        _lastAvatarId = _localUser["currentAvatar"].ToString();
+                        _assets.SmallImageKey = _localUser["currentAvatarImageUrl"].ToString();
+                        _avatarData = JObject.Parse(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.Avatar + _localUser["currentAvatar"].ToString()));
+                        var time = ((TimeSpan)(DateTime.Now - DateTime.Parse(_avatarData["created_at"].ToString())));
+                        _assets.SmallImageText = string.Format("Name: {0}, Release: {1}, Version: {2}, Created {3}.Y / {4}.D Ago", _avatarData["name"], _avatarData["releaseStatus"], _avatarData["version"], ((float)time.Days / 365.24).ToString("f1"), (int)time.TotalDays);
+                    }
+
                     _client.SetPresence(_richPresence);
                     _client.Invoke();
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.ToString());
+                     ConsoleManager.Write(ex.ToString());
                 }
                 Thread.Sleep(6000);
             }

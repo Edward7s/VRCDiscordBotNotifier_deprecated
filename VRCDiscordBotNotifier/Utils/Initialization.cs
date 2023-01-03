@@ -19,13 +19,6 @@ namespace VRCDiscordBotNotifier.Utils
         public Initialization()
         {
             Instance = this;
-            /*      var onlineFriends = JObject.FromObject(JObject.Parse(VRCWebRequest.Instance.SendVRCWebReq(VRCWebRequest.RequestType.Get, VRCInfo.VRCApiLink + VRCInfo.EndPoints.LocalUser)))["onlineFriends"];
-                  string? FriendsList = string.Empty;
-                  for (int i = 0; i < onlineFriends.ToArray().Length; i++)
-                      FriendsList += onlineFriends[i].ToString() + "\n";
-                  Filemanager.WriteFile(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Config.Instance.OnlineFriends, FriendsList);
-                  onlineFriends = null;
-                  FriendsList = null; */
             Task.Run(() => ChannelManager() );
             Task.Run(() => new FriendsMethods().AllFriends());
             Task.Run(() => CreateSetupChannel());
